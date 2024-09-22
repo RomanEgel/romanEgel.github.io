@@ -38,3 +38,4 @@ fetch('https://telegram-bot-131843337439.europe-west3.run.app/oauth/validate', {
     WebApp.showAlert('Failed to validate. Please try again later.');
     WebApp.close();
   });
+
