@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
-import { Search, User, ShoppingBag, Briefcase, Calendar, ChevronDown, MapPin, Globe } from 'lucide-react'
+import { Search, User, ShoppingBag, Briefcase, Calendar, ChevronDown, MapPin } from 'lucide-react'
 
 interface Item {
   id: number
