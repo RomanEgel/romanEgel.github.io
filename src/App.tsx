@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { Search, User, ShoppingBag, Briefcase, Calendar, ChevronDown, MapPin } from 'lucide-react'
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
+import { User, ShoppingBag, Briefcase, Calendar, MapPin, Filter, SortAsc, Search } from 'lucide-react'
 
 interface Item {
   id: number
@@ -37,30 +37,41 @@ type ListItem = Item | Service | Event;
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('community')
-  const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<'filter' | 'sort' | null>(null)
 
-  const categoryDropdownRef = useRef<HTMLDivElement>(null)
+  const filterButtonRef = useRef<HTMLButtonElement>(null)
+  const sortButtonRef = useRef<HTMLButtonElement>(null)
+  const filterDropdownRef = useRef<HTMLDivElement>(null)
   const sortDropdownRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
-      }
-      if (sortDropdownRef.current && !sortDropdownRef.current.contains(event.target as Node)) {
-        setIsSortDropdownOpen(false)
-      }
+  const handleDocumentClick = useCallback((event: MouseEvent) => {
+    if (
+      filterButtonRef.current?.contains(event.target as Node) ||
+      sortButtonRef.current?.contains(event.target as Node)
+    ) {
+      return;
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
+    if (
+      !filterDropdownRef.current?.contains(event.target as Node) &&
+      !sortDropdownRef.current?.contains(event.target as Node)
+    ) {
+      setActiveDropdown(null);
     }
-  }, [])
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [handleDocumentClick]);
+
+  const toggleDropdown = (dropdown: 'filter' | 'sort') => {
+    setActiveDropdown(prevDropdown => prevDropdown === dropdown ? null : dropdown);
+  };
 
   const getCategoryDisplayName = (category: string) => {
     return category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -109,17 +120,13 @@ function App() {
       result = result.filter(item => item.category === activeCategory)
     }
 
-    if (searchQuery) {
-      result = result.filter(item => item.title.toLowerCase().includes(searchQuery.toLowerCase()))
-    }
-
     return result.sort((a, b) => {
       if (sortBy === 'dateAsc') {
         return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       }
       return 0 // For 'relevance', we'd typically use a more complex algorithm
     })
-  }, [activeTab, activeCategory, searchQuery, sortBy, items, services, events])
+  }, [activeTab, activeCategory, sortBy, items, services, events])
 
   useEffect(() => {
     setActiveCategory('all')
@@ -147,129 +154,109 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-black p-4 fixed top-0 left-0 right-0 z-10">
+      <header className="bg-black p-2 fixed top-0 left-0 right-0 z-10">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/icon.png" alt="Locals Only Icon" className="h-10 w-10 mr-4" />
-            <h1 className="text-2xl font-bold">Locals Only</h1>
+            <img src="/icon.png" alt="Locals Only Icon" className="h-6 w-6 mr-2" />
+            <h1 className="text-lg font-bold">Locals Only</h1>
           </div>
           <div className="flex items-center">
-            <MapPin className="h-5 w-5 text-green-500 mr-1" />
-            <span className="mr-4 text-lg">Lisbon Surfing</span>
-            <button className="p-2 rounded-full bg-gray-800 hover:bg-gray-700">
-              <User className="h-6 w-6" />
+            <MapPin className="h-4 w-4 text-green-500 mr-1" />
+            <span className="mr-4 text-sm">Lisbon Surfing</span>
+            <button className="p-1 rounded-full bg-gray-800 hover:bg-gray-700">
+              <User className="h-5 w-5" />
             </button>
           </div>
         </div>
       </header>
 
+      <div className="bg-gray-800 py-1 px-2 fixed top-10 left-0 right-0 z-10 flex justify-end space-x-2">
+        <button 
+          className="p-1 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center"
+          onClick={() => {/* Add search functionality here */}}
+        >
+          <Search className="h-4 w-4" />
+        </button>
+        <div className="relative">
+          <button 
+            ref={filterButtonRef}
+            className="p-1 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center"
+            onClick={() => toggleDropdown('filter')}
+          >
+            <Filter className="h-4 w-4" />
+            {activeCategory !== 'all' && (
+              <span className="ml-2 text-xs">{getCategoryDisplayName(activeCategory)}</span>
+            )}
+          </button>
+          {activeDropdown === 'filter' && (
+            <div 
+              ref={filterDropdownRef} 
+              className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+            >
+              <div className="py-1">
+                <p className="px-4 py-2 text-sm text-gray-400">Filter by category:</p>
+                {categories.map((category) => (
+                  <a
+                    key={category}
+                    href="#"
+                    className={`block px-4 py-2 text-sm ${activeCategory === category ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                    onClick={() => {
+                      setActiveCategory(category)
+                      setActiveDropdown(null)
+                    }}
+                  >
+                    {getCategoryDisplayName(category)}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="relative">
+          <button 
+            ref={sortButtonRef}
+            className="p-1 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center"
+            onClick={() => toggleDropdown('sort')}
+          >
+            <SortAsc className="h-4 w-4" />
+            <span className="ml-2 text-xs">
+              {sortBy === 'relevance' ? 'Relevance' : 'Date (Oldest)'}
+            </span>
+          </button>
+          {activeDropdown === 'sort' && (
+            <div 
+              ref={sortDropdownRef} 
+              className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+            >
+              <div className="py-1">
+                <p className="px-4 py-2 text-sm text-gray-400">Sort results:</p>
+                <a
+                  href="#"
+                  className={`block px-4 py-2 text-sm ${sortBy === 'relevance' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                  onClick={() => {
+                    setSortBy('relevance')
+                    setActiveDropdown(null)
+                  }}
+                >
+                  Relevance
+                </a>
+                <a
+                  href="#"
+                  className={`block px-4 py-2 text-sm ${sortBy === 'dateAsc' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                  onClick={() => {
+                    setSortBy('dateAsc')
+                    setActiveDropdown(null)
+                  }}
+                >
+                  Date (Oldest)
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <main className="container mx-auto p-4 pt-20 pb-24">
-        <div className="mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-2 pl-10 rounded-lg border border-gray-700 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
-          </div>
-        </div>
-
-        <div className="mb-6 flex justify-between">
-          <div>
-            <p className="text-sm text-gray-400 mb-2">Filter by category:</p>
-            <div ref={categoryDropdownRef} className="relative inline-block text-left">
-              <div>
-                <button 
-                  type="button" 
-                  className="inline-flex justify-center w-full rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-green-500" 
-                  id="menu-button" 
-                  aria-expanded={isDropdownOpen} 
-                  aria-haspopup="true"
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                >
-                  {getCategoryDisplayName(activeCategory)}
-                  <ChevronDown className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
-              {isDropdownOpen && (
-                <div className="origin-top-right absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabIndex={-1}>
-                  <div className="py-1" role="none">
-                    {categories.map((category) => (
-                      <a
-                        key={category}
-                        href="#"
-                        className="text-white block px-4 py-2 text-sm hover:bg-gray-700"
-                        role="menuitem"
-                        tabIndex={-1}
-                        id={`menu-item-${category}`}
-                        onClick={() => {
-                          setActiveCategory(category)
-                          setIsDropdownOpen(false)
-                        }}
-                      >
-                        {getCategoryDisplayName(category)}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400 mb-2">Sort results:</p>
-            <div ref={sortDropdownRef} className="relative inline-block text-left">
-              <div>
-                <button 
-                  type="button" 
-                  className="inline-flex justify-center w-full rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-green-500" 
-                  id="sort-menu-button" 
-                  aria-expanded={isSortDropdownOpen} 
-                  aria-haspopup="true"
-                  onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                >
-                  {sortBy === 'relevance' ? 'Relevance' : 'Date (Oldest)'}
-                  <ChevronDown className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
-                </button>
-              </div>
-              {isSortDropdownOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu-button" tabIndex={-1}>
-                  <div className="py-1" role="none">
-                    <a
-                      href="#"
-                      className="text-white block px-4 py-2 text-sm hover:bg-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="sort-menu-item-relevance"
-                      onClick={() => {
-                        setSortBy('relevance')
-                        setIsSortDropdownOpen(false)
-                      }}
-                    >
-                      Relevance
-                    </a>
-                    <a
-                      href="#"
-                      className="text-white block px-4 py-2 text-sm hover:bg-gray-700"
-                      role="menuitem"
-                      tabIndex={-1}
-                      id="sort-menu-item-date-asc"
-                      onClick={() => {
-                        setSortBy('dateAsc')
-                        setIsSortDropdownOpen(false)
-                      }}
-                    >
-                      Date (Oldest)
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
         {renderTabContent()}
       </main>
 
