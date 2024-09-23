@@ -48,15 +48,6 @@ type TabType = 'community' | 'items' | 'services' | 'news'
 type SortType = 'relevance' | 'dateAsc'
 type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 
-interface LocalsUser {
-  id: number;
-  firstName: string;
-  lastName: string;
-  username: string;
-  languageCode: string;
-  allowsWriteToPm: boolean;
-}
-
 interface LocalsCommunity {
   id: number;
   name: string;
