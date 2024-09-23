@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Plus, Newspaper } from 'lucide-react'
+import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Newspaper } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService' // Import the service functions
 import { useAuth } from './AuthContext'; // Import the useAuth hook
 
