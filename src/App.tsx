@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Plus, Newspaper } from 'lucide-react'
 
-interface Item {
+interface LocalsItem {
   id: number
   title: string
   price: number
@@ -12,7 +12,7 @@ interface Item {
   description: string
 }
 
-interface Service {
+interface LocalsService {
   id: number
   title: string
   price: number
@@ -23,7 +23,7 @@ interface Service {
   description: string
 }
 
-interface Event {
+interface LocalsEvent {
   id: number
   title: string
   date: string
@@ -34,7 +34,7 @@ interface Event {
   description: string
 }
 
-interface News {
+interface LocalsNews {
   id: number
   title: string
   image: string
@@ -46,9 +46,30 @@ interface News {
 
 type TabType = 'community' | 'items' | 'services' | 'news'
 type SortType = 'relevance' | 'dateAsc'
-type ListItem = Item | Service | Event | News;
+type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 
-function App() {
+interface LocalsUser {
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  languageCode: string;
+  allowsWriteToPm: boolean;
+}
+
+interface LocalsCommunity {
+  id: number;
+  name: string;
+  description: string;
+  membersCount: number;
+}
+
+interface AppProps {
+  user: LocalsUser;
+  community: LocalsCommunity;
+}
+
+function App({ user, community }: AppProps) {
   const [activeTab, setActiveTab] = useState<TabType>('community')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -91,28 +112,28 @@ function App() {
     return category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   }
 
-  const items: Item[] = [
+  const items: LocalsItem[] = [
     { id: 1, title: "Vintage Bicycle", price: 150, image: "/bike.png", author: "Alice Smith", publishedAt: "2023-07-10 14:30", category: "used items", description: "Classic 1980s road bike, perfect for city commutes or weekend rides." },
     { id: 2, title: "Handmade Pottery", price: 50, image: "/pottery.png", author: "Bob Johnson", publishedAt: "2023-07-09 10:15", category: "handmade", description: "Unique, hand-crafted ceramic vase with intricate floral design." },
     { id: 3, title: "Local Honey", price: 10, image: "/honey.png", author: "Carol Williams", publishedAt: "2023-07-08 16:45", category: "food", description: "Pure, organic honey from local beekeepers. Great for tea or baking." },
     { id: 4, title: "Old Books", price: 0, image: "/old_books.png", author: "David Brown", publishedAt: "2023-07-07 09:00", category: "giveaway", description: "Collection of classic literature books in good condition. Free to a good home." },
   ]
 
-  const services: Service[] = [
+  const services: LocalsService[] = [
     { id: 1, title: "Gardening Services", price: 25, image: "/gardening.png", author: "Eva Green", publishedAt: "2023-07-06 11:30", category: "maintenance", description: "Professional garden maintenance, including mowing, pruning, and planting." },
     { id: 2, title: "Bike Repair", price: 40, image: "/bike_repair.png", author: "Frank White", publishedAt: "2023-07-05 13:20", category: "repair", description: "Expert bicycle repair and tune-up service. Quick turnaround time." },
     { id: 3, title: "House Painting", price: 100, image: "/house_painting.png", author: "Grace Lee", publishedAt: "2023-07-04 15:10", category: "construction", description: "Interior and exterior house painting. Quality work at competitive prices." },
     { id: 4, title: "Babysitting", price: 15, image: "/baby_sitting.png", author: "Henry Davis", publishedAt: "2023-07-03 17:00", category: "care", description: "Experienced and reliable babysitter available for evenings and weekends." },
   ]
 
-  const events: Event[] = [
+  const events: LocalsEvent[] = [
     { id: 1, title: "Community Cleanup", image: "/city_cleanup.png", date: "2023-07-15", author: "Ivy Wilson", publishedAt: "2023-07-02 08:45", category: "sport", description: "Join us for a day of cleaning up our local parks and streets. Equipment provided." },
     { id: 2, title: "Local Art Exhibition", image: "/local_art.png", date: "2023-07-22", author: "Jack Thompson", publishedAt: "2023-07-01 14:30", category: "art", description: "Showcase of talented local artists featuring paintings, sculptures, and photography." },
     { id: 3, title: "Startup Networking Event", image: "/networking.png", date: "2023-07-29", author: "Karen Martinez", publishedAt: "2023-06-30 11:20", category: "business", description: "Connect with local entrepreneurs and investors. Great opportunity for networking." },
     { id: 4, title: "Group Hiking Trip", image: "/group_hiking.png", date: "2023-08-05", author: "Liam Anderson", publishedAt: "2023-06-29 16:15", category: "travelling", description: "Scenic 10km hike through beautiful forest trails. Suitable for all fitness levels." },
   ]
 
-  const news: News[] = [
+  const news: LocalsNews[] = [
     { id: 1, title: "New Community Center Opening", image: "/community_center.png", author: "City Council", publishedAt: "2023-07-12 09:00", category: "local", description: "Grand opening of our new state-of-the-art community center this weekend." },
     { id: 2, title: "Local Artist Wins National Award", image: "/artist_award.png", author: "Arts Committee", publishedAt: "2023-07-11 14:30", category: "culture", description: "Lisbon-based painter Maria Santos receives prestigious national art award." },
     { id: 3, title: "Beach Cleanup Initiative Launched", image: "/beach_cleanup.png", author: "Environmental Group", publishedAt: "2023-07-10 11:15", category: "environment", description: "New program aims to keep our beaches clean with weekly volunteer events." },
@@ -203,7 +224,7 @@ function App() {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <MapPin className="h-4 w-4 text-green-500 mr-1" />
-            <span className="text-sm">Lisbon Surfing</span>
+            <span className="text-sm">{community.name}</span>
           </div>
           <div className="flex items-center">
             <button className="p-1 rounded-full bg-gray-800 hover:bg-gray-700">
