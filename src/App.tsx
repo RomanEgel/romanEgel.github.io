@@ -65,11 +65,10 @@ interface LocalsCommunity {
 }
 
 interface AppProps {
-  user: LocalsUser;
   community: LocalsCommunity;
 }
 
-function App({ user, community }: AppProps) {
+function App({ community }: AppProps) {
   const [activeTab, setActiveTab] = useState<TabType>('community')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
   const [activeCategory, setActiveCategory] = useState<string>('all')

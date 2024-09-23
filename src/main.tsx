@@ -31,7 +31,7 @@ fetch('https://telegram-bot-131843337439.europe-west3.run.app/oauth/validate', {
 
       ReactDOM.createRoot(document.getElementById('root')!).render(
         <React.StrictMode>
-          <App user={data.user} community={data.community} />
+          <App community={data.community} />
         </React.StrictMode>,
       )
     } else {
