@@ -1,7 +1,8 @@
+import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Newspaper } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService' // Import the service functions
-import { useAuth } from './AuthContext'; // Import the useAuth hook
+import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
+import { useAuth } from './AuthContext'
 
 interface LocalsItem {
   id: number
@@ -9,12 +10,12 @@ interface LocalsItem {
   price: number
   image: string
   author: string
-  username: string // Added username property
+  username: string
   publishedAt: string
   category: string
   description: string
-  communityId: number // Added communityId property
-  messageId: number // Added messageId property
+  communityId: number
+  messageId: number
 }
 
 interface LocalsService {
@@ -23,12 +24,12 @@ interface LocalsService {
   price: number
   image: string
   author: string
-  username: string // Added username property
+  username: string
   publishedAt: string
   category: string
   description: string
-  communityId: number // Added communityId property
-  messageId: number // Added messageId property
+  communityId: number
+  messageId: number
 }
 
 interface LocalsEvent {
@@ -37,12 +38,12 @@ interface LocalsEvent {
   date: string
   image: string
   author: string
-  username: string // Added username property
+  username: string
   publishedAt: string
   category: string
   description: string
-  communityId: number // Added communityId property
-  messageId: number // Added messageId property
+  communityId: number
+  messageId: number
 }
 
 interface LocalsNews {
@@ -50,12 +51,12 @@ interface LocalsNews {
   title: string
   image: string
   author: string
-  username: string // Added username property
+  username: string
   publishedAt: string
   category: string
   description: string
-  communityId: number // Added communityId property
-  messageId: number // Added messageId property
+  communityId: number
+  messageId: number
 }
 
 type TabType = 'community' | 'items' | 'services' | 'news'
@@ -74,7 +75,7 @@ interface AppProps {
 }
 
 function App({ community }: AppProps) {
-  const { authorization } = useAuth(); // Use the authorization value from context
+  const { authorization } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('community')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -191,13 +192,18 @@ function App({ community }: AppProps) {
       if (sortBy === 'dateAsc') {
         return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       }
-      return 0 // For 'relevance', we'd typically use a more complex algorithm
+      return 0
     })
   }, [activeTab, activeCategory, sortBy, searchQuery, items, services, events, news])
 
   useEffect(() => {
     setActiveCategory('all')
   }, [activeTab])
+
+
+  const openTelegramLink = (url: string) => {
+    WebApp.openLink(url);
+  };
 
   const renderTabContent = () => {
     if (filteredAndSortedItems.length === 0) {
@@ -210,11 +216,10 @@ function App({ community }: AppProps) {
     return (
       <div className="flex flex-col space-y-4 mb-16 w-full">
         {filteredAndSortedItems.map((item) => (
-          // TODO: Fix the link
-          <a 
+          <div 
             key={item.id} 
-            href={`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`} 
-            className="bg-gray-800 rounded-lg shadow overflow-hidden flex items-center"
+            onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
+            className="bg-gray-800 rounded-lg shadow overflow-hidden flex items-center cursor-pointer"
           >
             <div className="w-24 h-24 flex-shrink-0 relative">
               <img 
@@ -229,10 +234,18 @@ function App({ community }: AppProps) {
               {'date' in item && <p className="text-green-400 font-bold">{item.date}</p>}
               <p className="text-sm text-gray-300 mt-1 line-clamp-2">{item.description}</p>
               <p className="text-xs text-gray-400 mt-2 truncate">
-                Posted by <a href={`https://t.me/${item.username}`} className="text-blue-400 hover:underline">{item.author}</a> on {item.publishedAt}
+                Posted by <span 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openTelegramLink(`https://t.me/${item.username}`);
+                  }}
+                  className="text-blue-400 hover:underline cursor-pointer"
+                >
+                  {item.author}
+                </span> on {item.publishedAt}
               </p>
             </div>
-          </a>
+          </div>
         ))}
       </div>
     )
