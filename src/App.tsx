@@ -9,9 +9,12 @@ interface LocalsItem {
   price: number
   image: string
   author: string
+  username: string // Added username property
   publishedAt: string
   category: string
   description: string
+  communityId: number // Added communityId property
+  messageId: number // Added messageId property
 }
 
 interface LocalsService {
@@ -20,9 +23,12 @@ interface LocalsService {
   price: number
   image: string
   author: string
+  username: string // Added username property
   publishedAt: string
   category: string
   description: string
+  communityId: number // Added communityId property
+  messageId: number // Added messageId property
 }
 
 interface LocalsEvent {
@@ -31,9 +37,12 @@ interface LocalsEvent {
   date: string
   image: string
   author: string
+  username: string // Added username property
   publishedAt: string
   category: string
   description: string
+  communityId: number // Added communityId property
+  messageId: number // Added messageId property
 }
 
 interface LocalsNews {
@@ -41,9 +50,12 @@ interface LocalsNews {
   title: string
   image: string
   author: string
+  username: string // Added username property
   publishedAt: string
   category: string
   description: string
+  communityId: number // Added communityId property
+  messageId: number // Added messageId property
 }
 
 type TabType = 'community' | 'items' | 'services' | 'news'
@@ -198,7 +210,12 @@ function App({ community }: AppProps) {
     return (
       <div className="flex flex-col space-y-4 mb-16 w-full">
         {filteredAndSortedItems.map((item) => (
-          <div key={item.id} className="bg-gray-800 rounded-lg shadow overflow-hidden flex items-center">
+          // TODO: Fix the link
+          <a 
+            key={item.id} 
+            href={`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`} 
+            className="bg-gray-800 rounded-lg shadow overflow-hidden flex items-center"
+          >
             <div className="w-24 h-24 flex-shrink-0 relative">
               <img 
                 src={item.image} 
@@ -212,10 +229,10 @@ function App({ community }: AppProps) {
               {'date' in item && <p className="text-green-400 font-bold">{item.date}</p>}
               <p className="text-sm text-gray-300 mt-1 line-clamp-2">{item.description}</p>
               <p className="text-xs text-gray-400 mt-2 truncate">
-                Posted by {item.author} on {item.publishedAt}
+                Posted by <a href={`https://t.me/${item.username}`} className="text-blue-400 hover:underline">{item.author}</a> on {item.publishedAt}
               </p>
             </div>
-          </div>
+          </a>
         ))}
       </div>
     )
