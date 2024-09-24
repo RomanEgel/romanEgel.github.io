@@ -205,6 +205,17 @@ function App({ community }: AppProps) {
     WebApp.openLink(url);
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   const renderTabContent = () => {
     if (filteredAndSortedItems.length === 0) {
       return (
@@ -230,20 +241,29 @@ function App({ community }: AppProps) {
             </div>
             <div className="p-4 flex-grow min-w-0">
               <h3 className="font-semibold text-white truncate">{item.title}</h3>
-              {'price' in item && <p className="text-green-400 font-bold">${item.price}</p>}
-              {'date' in item && <p className="text-green-400 font-bold">{item.date}</p>}
+              {'price' in item && <p className="text-green-400 font-bold">{item.price}</p>}
+              {'date' in item && (
+                <p className="text-green-400 font-bold">
+                  {formatDate(item.date)}
+                </p>
+              )}
               <p className="text-sm text-gray-300 mt-1 line-clamp-2">{item.description}</p>
-              <p className="text-xs text-gray-400 mt-2 truncate">
-                Posted by <span 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openTelegramLink(`https://t.me/${item.username}`);
-                  }}
-                  className="text-blue-400 hover:underline cursor-pointer"
-                >
-                  {item.author}
-                </span> on {item.publishedAt}
-              </p>
+              <div className="text-xs text-gray-400 mt-2 flex flex-wrap justify-between items-center">
+                <p className="truncate mr-2">
+                  Posted by <span 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openTelegramLink(`https://t.me/${item.username}`);
+                    }}
+                    className="text-blue-400 hover:underline cursor-pointer"
+                  >
+                    {item.author}
+                  </span>
+                </p>
+                <p className="whitespace-nowrap">
+                  {formatDate(item.publishedAt)}
+                </p>
+              </div>
             </div>
           </div>
         ))}
