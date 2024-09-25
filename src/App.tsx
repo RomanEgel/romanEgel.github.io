@@ -8,6 +8,7 @@ interface LocalsItem {
   id: number
   title: string
   price: number
+  currency: string
   image: string
   author: string
   username: string
@@ -22,6 +23,7 @@ interface LocalsService {
   id: number
   title: string
   price: number
+  currency: string
   image: string
   author: string
   username: string
@@ -216,6 +218,15 @@ function App({ community }: AppProps) {
     });
   };
 
+  const formatPrice = (price: number, currency: string) => {
+    if (currency === 'USD') {
+      return `$${price.toFixed(2)}`;
+    } else if (currency === 'RUB') {
+      return `${Math.round(price)} ₽`;
+    }
+    return `${price} ${currency}`;  // Fallback for any other currency
+  };
+
   const renderTabContent = () => {
     if (filteredAndSortedItems.length === 0) {
       return (
@@ -241,7 +252,11 @@ function App({ community }: AppProps) {
             </div>
             <div className="p-4 flex-grow min-w-0">
               <h3 className="font-semibold text-white truncate">{item.title}</h3>
-              {'price' in item && <p className="text-green-400 font-bold">{item.price}</p>}
+              {'price' in item && 'currency' in item && (
+                <p className="text-green-400 font-bold">
+                  {formatPrice(item.price, item.currency)}
+                </p>
+              )}
               {'date' in item && (
                 <p className="text-green-400 font-bold">
                   {formatDate(item.date)}
