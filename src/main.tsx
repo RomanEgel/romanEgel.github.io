@@ -12,7 +12,7 @@ import { createAppStyles, ThemeColors } from './AppStyles';
 
 let initDataRawToUse: string;
 let themeColors: ThemeColors = {
-  bg_color: "#17212b",
+  bg_color: "#a4a832",
   text_color: "#f5f5f5",
   button_color: "#5288c1",
   button_text_color: "#ffffff",
