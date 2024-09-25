@@ -20,6 +20,11 @@ let themeColors: ThemeColors = {
   link_color: "#6ab3f3",
   secondary_bg_color: "#232e3c",
   subtitle_text_color: "#708499",
+  accent_text_color: "#6ab2f2",
+  destructive_text_color: "#ec3942",
+  header_bg_color: "#17212b",
+  section_bg_color: "#17212b",
+  section_header_text_color: "#6ab3f3",
 };
 
 if (import.meta.env.MODE === 'development') {
@@ -36,6 +41,11 @@ if (import.meta.env.MODE === 'development') {
     link_color: themeParams['linkColor'] || themeColors.link_color,
     secondary_bg_color: themeParams['secondaryBgColor'] || themeColors.secondary_bg_color,
     subtitle_text_color: themeParams['subtitleTextColor'] || themeColors.subtitle_text_color,
+    accent_text_color: themeParams['accentTextColor'] || themeColors.accent_text_color,
+    destructive_text_color: themeParams['destructiveTextColor'] || themeColors.destructive_text_color,
+    header_bg_color: themeParams['headerBgColor'] || themeColors.header_bg_color,
+    section_bg_color: themeParams['sectionBgColor'] || themeColors.section_bg_color,
+    section_header_text_color: themeParams['sectionHeaderTextColor'] || themeColors.section_header_text_color,
   };
 }
 

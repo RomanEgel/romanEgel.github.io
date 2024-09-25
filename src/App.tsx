@@ -256,7 +256,7 @@ function App({ community }: AppProps) {
             onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card"
           >
-            <div className="w-24 h-24 flex-shrink-0 relative">
+            <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
               <img 
                 src={item.image} 
                 alt={item.title} 
@@ -266,12 +266,12 @@ function App({ community }: AppProps) {
             <div className="p-4 flex-grow min-w-0">
               <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
               {'price' in item && 'currency' in item && (
-                <p className="font-bold app-link text-sm">
+                <p className="font-bold app-price text-sm">
                   {formatPrice(item.price, item.currency)}
                 </p>
               )}
               {'date' in item && (
-                <p className="font-bold app-link text-sm">
+                <p className="font-bold app-date text-sm">
                   {formatDate(item.date)}
                 </p>
               )}
@@ -283,12 +283,12 @@ function App({ community }: AppProps) {
                       e.stopPropagation();
                       openTelegramLink(`https://t.me/${item.username}`);
                     }}
-                    className="app-link hover:underline cursor-pointer"
+                    className="app-author hover:underline cursor-pointer"
                   >
                     {item.author}
                   </span>
                 </p>
-                <p className="whitespace-nowrap">
+                <p className="whitespace-nowrap app-date">
                   {formatDate(item.publishedAt)}
                 </p>
               </div>
@@ -305,7 +305,7 @@ function App({ community }: AppProps) {
         <div className="flex justify-between items-center text-center">
           <div className="flex items-center">
             <MapPin className="h-4 w-4 mr-1 app-link" />
-            <span className="text-sm">{community.name}</span>
+            <span className="text-sm app-text">{community.name}</span>
           </div>
           <div className="flex items-center">
             <button className="p-1 rounded-full app-button">
@@ -324,7 +324,7 @@ function App({ community }: AppProps) {
           >
             <Filter className="h-5 w-5" />
             {activeCategory !== 'all' && (
-              <span className="ml-2 text-sm truncate max-w-[100px]">
+              <span className="ml-2 text-sm truncate max-w-[100px] app-text">
                 {getCategoryDisplayName(activeCategory)}
               </span>
             )}
@@ -332,15 +332,15 @@ function App({ community }: AppProps) {
           {activeDropdown === 'filter' && (
             <div 
               ref={filterDropdownRef} 
-              className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+              className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
             >
               <div className="py-1">
-                <p className="px-4 py-2 text-sm text-gray-400">{t('filterByCategory')}</p>
+                <p className="px-4 py-2 text-sm app-hint">{t('filterByCategory')}</p>
                 {categories.map((category) => (
                   <a
                     key={category}
                     href="#"
-                    className={`block px-4 py-2 text-sm ${activeCategory === category ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                    className={`block px-4 py-2 text-sm app-dropdown-item ${activeCategory === category ? 'active' : ''}`}
                     onClick={() => {
                       setActiveCategory(category)
                       setActiveDropdown(null)
@@ -361,7 +361,7 @@ function App({ community }: AppProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
           />
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-hint" />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
         </div>
         <div className="relative">
           <button 
@@ -374,13 +374,13 @@ function App({ community }: AppProps) {
           {activeDropdown === 'sort' && (
             <div 
               ref={sortDropdownRef} 
-              className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+              className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
             >
               <div className="py-1">
-                <p className="px-4 py-2 text-sm text-gray-400">{t('sortResults')}</p>
+                <p className="px-4 py-2 text-sm app-hint">{t('sortResults')}</p>
                 <a
                   href="#"
-                  className={`block px-4 py-2 text-sm ${sortBy === 'relevance' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                  className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'relevance' ? 'active' : ''}`}
                   onClick={() => {
                     setSortBy('relevance')
                     setActiveDropdown(null)
@@ -390,7 +390,7 @@ function App({ community }: AppProps) {
                 </a>
                 <a
                   href="#"
-                  className={`block px-4 py-2 text-sm ${sortBy === 'dateAsc' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
+                  className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'dateAsc' ? 'active' : ''}`}
                   onClick={() => {
                     setSortBy('dateAsc')
                     setActiveDropdown(null)
@@ -413,7 +413,7 @@ function App({ community }: AppProps) {
           {['community', 'items', 'services', 'news'].map((tab) => (
             <button
               key={tab}
-              className={`flex-1 py-4 ${activeTab === tab ? 'app-link' : 'app-body'}`}
+              className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
               onClick={() => setActiveTab(tab as TabType)}
             >
               {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
