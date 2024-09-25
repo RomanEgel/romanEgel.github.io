@@ -105,13 +105,29 @@ export const createAppStyles = (colors: ThemeColors) => css`
     background-color: ${colors.secondary_bg_color};
   }
   
-  // Date and price styles
-  .app-date, .app-price {
+  // Date styles
+  .app-publication-date {
+    color: ${colors.subtitle_text_color};
+    font-size: 0.9em;
+  }
+    
+  .app-event-date {
+    color: ${colors.accent_text_color};
+    font-weight: bold;
+  }
+  
+  // Price styles
+  .app-price {
     color: ${colors.accent_text_color};
   }
   
   // Author styles
+  .app-author-text {
+    color: ${colors.subtitle_text_color};
+    font-size: 0.95em;
+  }
   .app-author {
     color: ${colors.link_color};
+    font-size: 0.95em;
   }
 `

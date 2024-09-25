@@ -271,13 +271,13 @@ function App({ community }: AppProps) {
                 </p>
               )}
               {'date' in item && (
-                <p className="font-bold app-date text-sm">
+                <p className="font-bold app-event-date text-sm">
                   {formatDate(item.date)}
                 </p>
               )}
               <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
               <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-subtitle">
-                <p className="truncate mr-2">
+                <p className="truncate mr-2 app-author-text">
                   {t('postedBy')} <span 
                     onClick={(e) => {
                       e.stopPropagation();
@@ -288,7 +288,7 @@ function App({ community }: AppProps) {
                     {item.author}
                   </span>
                 </p>
-                <p className="whitespace-nowrap app-date">
+                <p className="whitespace-nowrap app-publication-date">
                   {formatDate(item.publishedAt)}
                 </p>
               </div>
