@@ -209,18 +209,19 @@ function App({ community }: AppProps) {
     WebApp.openLink(url);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string, isEventDate: boolean = false) => {
     const options: Intl.DateTimeFormatOptions = { 
       weekday: 'short', 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      ...(isEventDate ? { timeZone: 'UTC' } : {})
     };
     
     const locale = community.language === 'ru' ? 'ru-RU' : 'en-US';
-    return new Date(dateString).toLocaleString(locale, options);
+    return new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
   };
 
   const t = (key: keyof typeof translations.en) => getTranslation(key, community.language);
@@ -275,7 +276,7 @@ function App({ community }: AppProps) {
               )}
               {'date' in item && (
                 <p className="font-bold app-event-date text-sm">
-                  {formatDate(item.date)}
+                  {formatDate(item.date, true)}
                 </p>
               )}
               <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
