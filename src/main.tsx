@@ -12,7 +12,7 @@ import { createAppStyles, ThemeColors } from './AppStyles';
 
 let initDataRawToUse: string;
 let themeColors: ThemeColors = {
-  bg_color: "#a4a832",
+  bg_color: "#17212b",
   text_color: "#f5f5f5",
   button_color: "#5288c1",
   button_text_color: "#ffffff",
@@ -27,13 +27,13 @@ if (import.meta.env.MODE === 'development') {
   const { initDataRaw, themeParams } = retrieveLaunchParams();
   initDataRawToUse = initDataRaw || '';
   themeColors = {
-    bg_color: themeParams.bg_color || themeColors.bg_color,
-    text_color: themeParams.text_color || themeColors.text_color,
-    button_color: themeParams.button_color || themeColors.button_color,
-    button_text_color: themeParams.button_text_color || themeColors.button_text_color,
-    hint_color: themeParams.hint_color || themeColors.hint_color,
-    link_color: themeParams.link_color || themeColors.link_color,
-    secondary_bg_color: themeParams.secondary_bg_color || themeColors.secondary_bg_color,
+    bg_color: themeParams['bgColor'] || themeColors.bg_color,
+    text_color: themeParams['textColor'] || themeColors.text_color,
+    button_color: themeParams['buttonColor'] || themeColors.button_color,
+    button_text_color: themeParams['buttonTextColor'] || themeColors.button_text_color,
+    hint_color: themeParams['hintColor'] || themeColors.hint_color,
+    link_color: themeParams['linkColor'] || themeColors.link_color,
+    secondary_bg_color: themeParams['secondaryBgColor'] || themeColors.secondary_bg_color,
   };
 }
 
