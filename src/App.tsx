@@ -264,7 +264,7 @@ function App({ community }: AppProps) {
               />
             </div>
             <div className="p-4 flex-grow min-w-0">
-              <h3 className="font-semibold truncate text-base mb-1">{item.title}</h3>
+              <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
               {'price' in item && 'currency' in item && (
                 <p className="font-bold app-link text-sm">
                   {formatPrice(item.price, item.currency)}
@@ -275,8 +275,8 @@ function App({ community }: AppProps) {
                   {formatDate(item.date)}
                 </p>
               )}
-              <p className="text-sm mt-1 line-clamp-2 app-hint">{item.description}</p>
-              <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-hint">
+              <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
+              <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-subtitle">
                 <p className="truncate mr-2">
                   {t('postedBy')} <span 
                     onClick={(e) => {

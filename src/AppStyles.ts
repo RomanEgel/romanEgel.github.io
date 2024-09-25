@@ -8,6 +8,7 @@ export interface ThemeColors {
   hint_color: string;
   link_color: string;
   secondary_bg_color: string;
+  subtitle_text_color: string;
 }
 
 export const createAppStyles = (colors: ThemeColors) => css`
@@ -34,5 +35,11 @@ export const createAppStyles = (colors: ThemeColors) => css`
   }
   .app-hint {
     color: ${colors.hint_color};
+  }
+  .app-subtitle {
+    color: ${colors.subtitle_text_color};
+  }
+  .app-text {
+    color: ${colors.text_color};
   }
 `

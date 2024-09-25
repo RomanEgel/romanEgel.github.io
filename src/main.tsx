@@ -19,6 +19,7 @@ let themeColors: ThemeColors = {
   hint_color: "#708499",
   link_color: "#6ab3f3",
   secondary_bg_color: "#232e3c",
+  subtitle_text_color: "#708499",
 };
 
 if (import.meta.env.MODE === 'development') {
@@ -34,6 +35,7 @@ if (import.meta.env.MODE === 'development') {
     hint_color: themeParams['hintColor'] || themeColors.hint_color,
     link_color: themeParams['linkColor'] || themeColors.link_color,
     secondary_bg_color: themeParams['secondaryBgColor'] || themeColors.secondary_bg_color,
+    subtitle_text_color: themeParams['subtitleTextColor'] || themeColors.subtitle_text_color,
   };
 }
 
