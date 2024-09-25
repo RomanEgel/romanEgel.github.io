@@ -76,7 +76,6 @@ interface LocalsCommunity {
 
 interface AppProps {
   community: LocalsCommunity;
-  // Remove the separate language prop
 }
 
 function App({ community }: AppProps) {
@@ -245,7 +244,7 @@ function App({ community }: AppProps) {
     if (filteredAndSortedItems.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-center text-gray-400">{t('noRecordsFound')}</p>
+          <p className="text-center app-hint">{t('noRecordsFound')}</p>
         </div>
       );
     }
@@ -255,7 +254,7 @@ function App({ community }: AppProps) {
           <div 
             key={item.id} 
             onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
-            className="bg-gray-800 rounded-lg shadow overflow-hidden flex items-center cursor-pointer"
+            className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card"
           >
             <div className="w-24 h-24 flex-shrink-0 relative">
               <img 
@@ -265,26 +264,26 @@ function App({ community }: AppProps) {
               />
             </div>
             <div className="p-4 flex-grow min-w-0">
-              <h3 className="font-semibold text-white truncate">{item.title}</h3>
+              <h3 className="font-semibold truncate text-base mb-1">{item.title}</h3>
               {'price' in item && 'currency' in item && (
-                <p className="text-green-400 font-bold">
+                <p className="font-bold app-link text-sm">
                   {formatPrice(item.price, item.currency)}
                 </p>
               )}
               {'date' in item && (
-                <p className="text-green-400 font-bold">
+                <p className="font-bold app-link text-sm">
                   {formatDate(item.date)}
                 </p>
               )}
-              <p className="text-sm text-gray-300 mt-1 line-clamp-2">{item.description}</p>
-              <div className="text-xs text-gray-400 mt-2 flex flex-wrap justify-between items-center">
+              <p className="text-sm mt-1 line-clamp-2 app-hint">{item.description}</p>
+              <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-hint">
                 <p className="truncate mr-2">
                   {t('postedBy')} <span 
                     onClick={(e) => {
                       e.stopPropagation();
                       openTelegramLink(`https://t.me/${item.username}`);
                     }}
-                    className="text-blue-400 hover:underline cursor-pointer"
+                    className="app-link hover:underline cursor-pointer"
                   >
                     {item.author}
                   </span>
@@ -301,26 +300,26 @@ function App({ community }: AppProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col">
-      <header className="bg-black p-2 fixed top-0 left-0 right-0 z-10">
+    <div className="min-h-screen flex flex-col app-body">
+      <header className="p-2 fixed top-0 left-0 right-0 z-10 app-header">
         <div className="flex justify-between items-center text-center">
           <div className="flex items-center">
-            <MapPin className="h-4 w-4 text-green-500 mr-1" />
+            <MapPin className="h-4 w-4 mr-1 app-link" />
             <span className="text-sm">{community.name}</span>
           </div>
           <div className="flex items-center">
-            <button className="p-1 rounded-full bg-gray-800 hover:bg-gray-700">
+            <button className="p-1 rounded-full app-button">
               <User className="h-5 w-5" />
             </button>
           </div>
         </div>
       </header>
 
-      <div className="bg-gray-800 py-2 px-4 fixed top-10 left-0 right-0 z-10 flex items-center space-x-2 text-center">
+      <div className="py-2 px-4 fixed top-10 left-0 right-0 z-10 flex items-center space-x-2 text-center app-header">
         <div className="relative">
           <button 
             ref={filterButtonRef}
-            className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 flex items-center justify-center"
+            className="p-2 rounded-lg flex items-center justify-center app-button"
             onClick={() => toggleDropdown('filter')}
           >
             <Filter className="h-5 w-5" />
@@ -360,14 +359,14 @@ function App({ community }: AppProps) {
             placeholder={t('search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
           />
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-hint" />
         </div>
         <div className="relative">
           <button 
             ref={sortButtonRef}
-            className="p-2 rounded-lg bg-gray-700 hover:bg-gray-600 flex items-center"
+            className="p-2 rounded-lg flex items-center app-button"
             onClick={() => toggleDropdown('sort')}
           >
             <SortAsc className="h-5 w-5" />
@@ -409,32 +408,20 @@ function App({ community }: AppProps) {
         {renderTabContent()}
       </main>
 
-      <nav className="bg-black fixed bottom-0 left-0 right-0 z-10">
+      <nav className="fixed bottom-0 left-0 right-0 z-10 app-header">
         <div className="flex justify-around">
-          <button
-            className={`flex-1 py-4 ${activeTab === 'community' ? 'text-green-500' : 'text-white'}`}
-            onClick={() => setActiveTab('community')}
-          >
-            <Calendar className="h-6 w-6 mx-auto" />
-          </button>
-          <button
-            className={`flex-1 py-4 ${activeTab === 'items' ? 'text-green-500' : 'text-white'}`}
-            onClick={() => setActiveTab('items')}
-          >
-            <Store className="h-6 w-6 mx-auto" />
-          </button>
-          <button
-            className={`flex-1 py-4 ${activeTab === 'services' ? 'text-green-500' : 'text-white'}`}
-            onClick={() => setActiveTab('services')}
-          >
-            <HeartHandshake className="h-6 w-6 mx-auto" />
-          </button>
-          <button
-            className={`flex-1 py-4 ${activeTab === 'news' ? 'text-green-500' : 'text-white'}`}
-            onClick={() => setActiveTab('news')}
-          >
-            <Newspaper className="h-6 w-6 mx-auto" />
-          </button>
+          {['community', 'items', 'services', 'news'].map((tab) => (
+            <button
+              key={tab}
+              className={`flex-1 py-4 ${activeTab === tab ? 'app-link' : 'app-body'}`}
+              onClick={() => setActiveTab(tab as TabType)}
+            >
+              {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
+              {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
+              {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
+              {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
+            </button>
+          ))}
         </div>
       </nav>
     </div>
