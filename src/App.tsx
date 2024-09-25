@@ -210,14 +210,17 @@ function App({ community }: AppProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', { 
+    const options: Intl.DateTimeFormatOptions = { 
       weekday: 'short', 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
+    };
+    
+    const locale = community.language === 'ru' ? 'ru-RU' : 'en-US';
+    return new Date(dateString).toLocaleString(locale, options);
   };
 
   const t = (key: keyof typeof translations.en) => getTranslation(key, community.language);
