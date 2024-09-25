@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Newspaper } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
+import { getTranslation, translations } from './localization';
 
 interface LocalsItem {
   id: number
@@ -70,10 +71,12 @@ interface LocalsCommunity {
   name: string;
   description: string;
   membersCount: number;
+  language: 'en' | 'ru';  // Add this line
 }
 
 interface AppProps {
   community: LocalsCommunity;
+  // Remove the separate language prop
 }
 
 function App({ community }: AppProps) {
@@ -218,7 +221,18 @@ function App({ community }: AppProps) {
     });
   };
 
-  const formatPrice = (price: number, currency: string) => {
+  const t = (key: keyof typeof translations.en) => getTranslation(key, community.language);
+
+  const formatPrice = (price: number | null | undefined, currency: string | null | undefined) => {
+    if (price === null || price === undefined) {
+      return t('uponRequest');
+    }
+    if (price === 0) {
+      return t('free');
+    }
+    if (currency === null || currency === undefined) {
+      return `${price}`;  // Return just the price if currency is not available
+    }
     if (currency === 'USD') {
       return `$${price.toFixed(2)}`;
     } else if (currency === 'RUB') {
@@ -231,7 +245,7 @@ function App({ community }: AppProps) {
     if (filteredAndSortedItems.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-center text-gray-400">No records found.</p>
+          <p className="text-center text-gray-400">{t('noRecordsFound')}</p>
         </div>
       );
     }
@@ -265,7 +279,7 @@ function App({ community }: AppProps) {
               <p className="text-sm text-gray-300 mt-1 line-clamp-2">{item.description}</p>
               <div className="text-xs text-gray-400 mt-2 flex flex-wrap justify-between items-center">
                 <p className="truncate mr-2">
-                  Posted by <span 
+                  {t('postedBy')} <span 
                     onClick={(e) => {
                       e.stopPropagation();
                       openTelegramLink(`https://t.me/${item.username}`);
@@ -322,7 +336,7 @@ function App({ community }: AppProps) {
               className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
             >
               <div className="py-1">
-                <p className="px-4 py-2 text-sm text-gray-400">Filter by category:</p>
+                <p className="px-4 py-2 text-sm text-gray-400">{t('filterByCategory')}</p>
                 {categories.map((category) => (
                   <a
                     key={category}
@@ -333,7 +347,7 @@ function App({ community }: AppProps) {
                       setActiveDropdown(null)
                     }}
                   >
-                    {getCategoryDisplayName(category)}
+                    {category === 'all' ? t('all') : getCategoryDisplayName(category)}
                   </a>
                 ))}
               </div>
@@ -343,7 +357,7 @@ function App({ community }: AppProps) {
         <div className="flex-grow relative">
           <input
             type="text"
-            placeholder="Search..."
+            placeholder={t('search')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
@@ -364,7 +378,7 @@ function App({ community }: AppProps) {
               className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
             >
               <div className="py-1">
-                <p className="px-4 py-2 text-sm text-gray-400">Sort results:</p>
+                <p className="px-4 py-2 text-sm text-gray-400">{t('sortResults')}</p>
                 <a
                   href="#"
                   className={`block px-4 py-2 text-sm ${sortBy === 'relevance' ? 'bg-gray-700 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white'}`}
@@ -373,7 +387,7 @@ function App({ community }: AppProps) {
                     setActiveDropdown(null)
                   }}
                 >
-                  Relevance
+                  {t('relevance')}
                 </a>
                 <a
                   href="#"
@@ -383,7 +397,7 @@ function App({ community }: AppProps) {
                     setActiveDropdown(null)
                   }}
                 >
-                  Date (Oldest)
+                  {t('dateOldest')}
                 </a>
               </div>
             </div>
