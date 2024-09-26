@@ -159,20 +159,24 @@ export const createAppStyles = (colors: ThemeColors) => css`
   }
 
   .app-main-content {
-    margin-top: calc(env(safe-area-inset-top) + 100px);
-    margin-bottom: calc(60px + env(safe-area-inset-bottom));
+    flex-grow: 1;
     overflow-y: auto;
-    height: calc(100% - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    padding-top: 100px; // Height of header (40px) + filter row (60px)
   }
 
   .app-nav {
     position: fixed;
-    bottom: env(safe-area-inset-bottom);
-    left: env(safe-area-inset-left);
-    right: env(safe-area-inset-right);
-    z-index: 20;
+    bottom: 0;
+    left: 0;
+    right: 0;
     background-color: ${colors.bg_color};
     height: 60px;
+    z-index: 20;
+  }
+
+  // Remove any padding from the container inside main content
+  .app-main-content > .container {
+    padding-top: 0;
   }
 
   @media (min-width: 768px) {
@@ -220,18 +224,8 @@ export const createAppStyles = (colors: ThemeColors) => css`
       margin-top: 100px; // Adjusted for header and filter row
       margin-bottom: 60px; // Adjust based on nav height
       height: calc(100% - 160px); // Adjusted for all fixed elements
+      padding-top: 0; // Remove top padding for larger screens
       overflow-y: auto;
-    }
-  }
-
-  // Add this new media query
-  @media (max-height: 450px) {
-    .app-nav {
-      display: none;
-    }
-
-    .app-main-content {
-      margin-bottom: env(safe-area-inset-bottom);
     }
   }
 `

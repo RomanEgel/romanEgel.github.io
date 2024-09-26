@@ -304,21 +304,30 @@ function App({ community }: AppProps) {
   }
 
   const [showNav, setShowNav] = useState(true);
+  const appContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      setShowNav(window.innerHeight > 450);
-    };
+    const visualViewport = window.visualViewport;
 
-    window.addEventListener('resize', handleResize);
-    handleResize(); // Call once to set initial state
+    if (visualViewport) {
+      const handleResize = () => {
+        if (appContainerRef.current) {
+          const containerHeight = appContainerRef.current.offsetHeight;
+          const visibleHeight = visualViewport.height;
+          setShowNav(containerHeight - visibleHeight < 100); // Adjust this threshold as needed
+        }
+      };
 
-    return () => window.removeEventListener('resize', handleResize);
+      visualViewport.addEventListener('resize', handleResize);
+      handleResize(); // Call once to set initial state
+
+      return () => visualViewport.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col app-body">
-      <div className="flex-grow flex flex-col app-container">
+      <div ref={appContainerRef} className="flex-grow flex flex-col app-container">
         <header className="app-header">
           <div className="flex justify-between items-center text-center">
             <div className="flex items-center">
@@ -425,7 +434,7 @@ function App({ community }: AppProps) {
         </div>
 
         <main className="flex-grow overflow-y-auto app-main-content">
-          <div className="container mx-auto p-4">
+          <div className="container mx-auto px-4 pb-16"> {/* Add bottom padding */}
             {renderTabContent()}
           </div>
         </main>
