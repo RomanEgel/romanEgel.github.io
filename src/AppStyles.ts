@@ -29,7 +29,7 @@ export const createAppStyles = (colors: ThemeColors) => css`
     right: env(safe-area-inset-right);
     z-index: 20;
     background-color: ${colors.header_bg_color};
-    color: ${colors.text_color};
+    color: ${colors.accent_text_color};
     padding: 0.5rem;
     height: 40px;
   }
