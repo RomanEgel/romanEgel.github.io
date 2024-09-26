@@ -1,22 +1,5 @@
 import { css } from '@emotion/react'
-
-export interface ThemeColors {
-  bg_color: string;
-  text_color: string;
-  button_color: string;
-  button_text_color: string;
-  hint_color: string;
-  link_color: string;
-  secondary_bg_color: string;
-  subtitle_text_color: string;
-  accent_text_color: string;
-  destructive_text_color: string;
-  header_bg_color: string;
-  buttom_bg_color: string;
-  section_bg_color: string;
-  section_header_text_color: string;
-  section_separator_color: string;
-}
+import { ThemeParams } from '@twa-dev/types';
 
 // Add this utility function
 const isLightColor = (color: string): boolean => {
@@ -36,24 +19,24 @@ const isLightColor = (color: string): boolean => {
 }
 
 // Update the createCSSVariables function
-const createCSSVariables = (colors: ThemeColors) => `
+const createCSSVariables = (theme_params: ThemeParams) => `
   :root {
-    --bg-color: ${colors.bg_color};
-    --text-color: ${colors.text_color};
-    --button-color: ${colors.button_color};
-    --button-text-color: ${colors.button_text_color};
-    --hint-color: ${colors.hint_color};
-    --link-color: ${colors.link_color};
-    --secondary-bg-color: ${colors.secondary_bg_color};
-    --subtitle-text-color: ${colors.subtitle_text_color};
-    --accent-text-color: ${colors.accent_text_color};
-    --destructive-text-color: ${colors.destructive_text_color};
-    --header-bg-color: ${colors.header_bg_color};
-    --buttom-bg-color: ${colors.buttom_bg_color};
-    --header-text-color: ${isLightColor(colors.header_bg_color) ? '#000000' : '#ffffff'};
-    --section-bg-color: ${colors.section_bg_color};
-    --section-header-text-color: ${colors.section_header_text_color};
-    --section-separator-color: ${colors.section_separator_color};
+    --bg-color: ${theme_params.bg_color};
+    --text-color: ${theme_params.text_color};
+    --button-color: ${theme_params.button_color};
+    --button-text-color: ${theme_params.button_text_color};
+    --hint-color: ${theme_params.hint_color};
+    --link-color: ${theme_params.link_color};
+    --secondary-bg-color: ${theme_params.secondary_bg_color};
+    --subtitle-text-color: ${theme_params.subtitle_text_color};
+    --accent-text-color: ${theme_params.accent_text_color};
+    --destructive-text-color: ${theme_params.destructive_text_color};
+    --header-bg-color: ${theme_params.header_bg_color};
+    --bottom-bar-bg-color: ${theme_params.bottom_bar_bg_color};
+    --header-text-color: ${isLightColor(theme_params.header_bg_color) ? '#000000' : '#ffffff'};
+    --section-bg-color: ${theme_params.section_bg_color};
+    --section-header-text-color: ${theme_params.section_header_text_color};
+    --section-separator-color: ${theme_params.section_separator_color};
   }
 `
 
@@ -109,7 +92,7 @@ const layoutStyles = css`
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: var(--buttom-bg-color);
+    background-color: var(--bottom-bar-bg-color);
     height: 60px;
     z-index: 20;
   }
@@ -262,13 +245,11 @@ const textStyles = css`
   }
 `
 
-export const createAppStyles = (colors: ThemeColors) => css`
-  ${createCSSVariables(colors)}
+export const createAppStyles = (theme_params: ThemeParams) => css`
+  ${createCSSVariables(theme_params)}
   ${baseStyles}
   ${layoutStyles}
   ${componentStyles}
   ${textStyles}
   ${responsiveStyles}
 `
-
-// Create a new file for responsive styles: AppResponsiveStyles.ts
