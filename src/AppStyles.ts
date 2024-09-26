@@ -65,7 +65,7 @@ export const createAppStyles = (colors: ThemeColors) => css`
     }
   }
   .app-card {
-    background-color: ${colors.section_separator_color};
+    background-color: ${colors.section_bg_color};
     border: 1px solid ${colors.hint_color}33; // 33 for 20% opacity
   }
   .app-hint {
