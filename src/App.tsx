@@ -288,6 +288,11 @@ function App({ community, user }: AppProps) {
                 alt={item.title} 
                 className="absolute inset-0 w-full h-full object-cover"
               />
+              {item.username === user.username && (
+                <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
+                  <UserCircle2 className="h-4 w-4" />
+                </div>
+              )}
             </div>
             <div className="p-4 flex-grow min-w-0">
               <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
@@ -319,11 +324,6 @@ function App({ community, user }: AppProps) {
                 </p>
               </div>
             </div>
-            {item.username === user.username && (
-              <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1 rounded-full">
-                <UserCircle2 className="h-4 w-4" />
-              </div>
-            )}
           </div>
         ))}
       </div>
