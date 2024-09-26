@@ -25,6 +25,10 @@ export const createAppStyles = (colors: ThemeColors) => css`
     background-color: ${colors.header_bg_color};
     color: ${colors.text_color};
   }
+  .app-filter-row {
+    background-color: ${colors.secondary_bg_color};
+    flex-shrink: 0;
+  }
   .app-button {
     background-color: ${colors.button_color};
     color: ${colors.button_text_color};
@@ -129,5 +133,54 @@ export const createAppStyles = (colors: ThemeColors) => css`
   .app-author {
     color: ${colors.link_color};
     font-size: 0.95em;
+  }
+  
+  .app-container {
+    background-color: ${colors.bg_color};
+    max-width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative; // Add this to create a positioning context
+  }
+
+  main {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 60px; // Add padding to account for the fixed nav bar
+  }
+
+  nav.app-header {
+    height: 60px; // Set a fixed height for the nav bar
+  }
+
+  @media (min-width: 768px) {
+    .app-body {
+      background-color: ${colors.secondary_bg_color};
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      height: 100vh;
+    }
+
+    .app-container {
+      max-width: 430px;
+      max-height: 932px;
+      width: 100%;
+      height: calc(100vh - 40px);
+      position: relative;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      overflow: hidden; // Ensure content doesn't overflow the rounded corners
+    }
+
+    nav.app-header {
+      position: absolute; // Change to absolute positioning within the container
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
   }
 `

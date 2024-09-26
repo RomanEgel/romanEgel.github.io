@@ -305,129 +305,133 @@ function App({ community }: AppProps) {
 
   return (
     <div className="min-h-screen flex flex-col app-body">
-      <header className="p-2 fixed top-0 left-0 right-0 z-10 app-header">
-        <div className="flex justify-between items-center text-center">
-          <div className="flex items-center">
-            <MapPin className="h-4 w-4 mr-1 app-link" />
-            <span className="text-sm app-text">{community.name}</span>
+      <div className="flex-grow flex flex-col app-container">
+        <header className="p-2 sticky top-0 left-0 right-0 z-10 app-header">
+          <div className="flex justify-between items-center text-center">
+            <div className="flex items-center">
+              <MapPin className="h-4 w-4 mr-1 app-link" />
+              <span className="text-sm app-text">{community.name}</span>
+            </div>
+            <div className="flex items-center">
+              <button className="p-1 rounded-full app-button">
+                <User className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-          <div className="flex items-center">
-            <button className="p-1 rounded-full app-button">
-              <User className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <div className="py-2 px-4 fixed top-10 left-0 right-0 z-10 flex items-center space-x-2 text-center app-header">
-        <div className="relative">
-          <button 
-            ref={filterButtonRef}
-            className="p-2 rounded-lg flex items-center justify-center app-button"
-            onClick={() => toggleDropdown('filter')}
-          >
-            <Filter className="h-5 w-5" />
-            {activeCategory !== 'all' && (
-              <span className="ml-2 text-sm truncate max-w-[100px] app-text">
-                {getCategoryDisplayName(activeCategory)}
-              </span>
-            )}
-          </button>
-          {activeDropdown === 'filter' && (
-            <div 
-              ref={filterDropdownRef} 
-              className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
+        <div className="py-2 px-4 sticky top-10 left-0 right-0 z-10 flex items-center space-x-2 text-center app-filter-row">
+          <div className="relative">
+            <button 
+              ref={filterButtonRef}
+              className="p-2 rounded-lg flex items-center justify-center app-button"
+              onClick={() => toggleDropdown('filter')}
             >
-              <div className="py-1">
-                <p className="px-4 py-2 text-sm app-hint">{t('filterByCategory')}</p>
-                {categories.map((category) => (
+              <Filter className="h-5 w-5" />
+              {activeCategory !== 'all' && (
+                <span className="ml-2 text-sm truncate max-w-[100px] app-text">
+                  {getCategoryDisplayName(activeCategory)}
+                </span>
+              )}
+            </button>
+            {activeDropdown === 'filter' && (
+              <div 
+                ref={filterDropdownRef} 
+                className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
+              >
+                <div className="py-1">
+                  <p className="px-4 py-2 text-sm app-hint">{t('filterByCategory')}</p>
+                  {categories.map((category) => (
+                    <a
+                      key={category}
+                      href="#"
+                      className={`block px-4 py-2 text-sm app-dropdown-item ${activeCategory === category ? 'active' : ''}`}
+                      onClick={() => {
+                        setActiveCategory(category)
+                        setActiveDropdown(null)
+                      }}
+                    >
+                      {category === 'all' ? t('all') : getCategoryDisplayName(category)}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex-grow relative">
+            <input
+              type="text"
+              placeholder={t('search')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
+            />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
+          </div>
+          <div className="relative">
+            <button 
+              ref={sortButtonRef}
+              className="p-2 rounded-lg flex items-center app-button"
+              onClick={() => toggleDropdown('sort')}
+            >
+              <SortAsc className="h-5 w-5" />
+            </button>
+            {activeDropdown === 'sort' && (
+              <div 
+                ref={sortDropdownRef} 
+                className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
+              >
+                <div className="py-1">
+                  <p className="px-4 py-2 text-sm app-hint">{t('sortResults')}</p>
                   <a
-                    key={category}
                     href="#"
-                    className={`block px-4 py-2 text-sm app-dropdown-item ${activeCategory === category ? 'active' : ''}`}
+                    className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'relevance' ? 'active' : ''}`}
                     onClick={() => {
-                      setActiveCategory(category)
+                      setSortBy('relevance')
                       setActiveDropdown(null)
                     }}
                   >
-                    {category === 'all' ? t('all') : getCategoryDisplayName(category)}
+                    {t('relevance')}
                   </a>
-                ))}
+                  <a
+                    href="#"
+                    className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'dateAsc' ? 'active' : ''}`}
+                    onClick={() => {
+                      setSortBy('dateAsc')
+                      setActiveDropdown(null)
+                    }}
+                  >
+                    {t('dateOldest')}
+                  </a>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        <div className="flex-grow relative">
-          <input
-            type="text"
-            placeholder={t('search')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
-          />
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
-        </div>
-        <div className="relative">
-          <button 
-            ref={sortButtonRef}
-            className="p-2 rounded-lg flex items-center app-button"
-            onClick={() => toggleDropdown('sort')}
-          >
-            <SortAsc className="h-5 w-5" />
-          </button>
-          {activeDropdown === 'sort' && (
-            <div 
-              ref={sortDropdownRef} 
-              className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
-            >
-              <div className="py-1">
-                <p className="px-4 py-2 text-sm app-hint">{t('sortResults')}</p>
-                <a
-                  href="#"
-                  className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'relevance' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSortBy('relevance')
-                    setActiveDropdown(null)
-                  }}
-                >
-                  {t('relevance')}
-                </a>
-                <a
-                  href="#"
-                  className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'dateAsc' ? 'active' : ''}`}
-                  onClick={() => {
-                    setSortBy('dateAsc')
-                    setActiveDropdown(null)
-                  }}
-                >
-                  {t('dateOldest')}
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
+
+        <main className="flex-grow overflow-y-auto">
+          <div className="container mx-auto p-4 pt-4 pb-24">
+            {renderTabContent()}
+          </div>
+        </main>
+
+        <nav className="fixed bottom-0 left-0 right-0 z-10 app-header">
+          <div className="flex justify-around">
+            {['community', 'items', 'services', 'news'].map((tab) => (
+              <button
+                key={tab}
+                className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab as TabType)}
+              >
+                {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
+                {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
+                {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
+                {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
+              </button>
+            ))}
+          </div>
+        </nav>
       </div>
-
-      <main className="container mx-auto p-4 pt-28 pb-24 flex-grow flex flex-col items-center">
-        {renderTabContent()}
-      </main>
-
-      <nav className="fixed bottom-0 left-0 right-0 z-10 app-header">
-        <div className="flex justify-around">
-          {['community', 'items', 'services', 'news'].map((tab) => (
-            <button
-              key={tab}
-              className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab as TabType)}
-            >
-              {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
-              {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
-              {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
-              {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
-            </button>
-          ))}
-        </div>
-      </nav>
     </div>
   )
 }
