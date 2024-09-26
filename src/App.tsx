@@ -238,11 +238,35 @@ function App({ community, user }: AppProps) {
   const [selectedItem, setSelectedItem] = useState<ListItem | null>(null);
 
   const handleItemClick = (item: ListItem) => {
+    // Preserve the current state before opening the detailed view
+    const currentState = {
+      activeTab,
+      activeCategory,
+      searchQuery,
+      scrollPosition: window.scrollY,
+    };
+    StorageManager.setItem('appState', JSON.stringify(currentState)).catch((error) => {
+      console.error('Error saving state to storage:', error);
+    });
+
     setSelectedItem(item);
   };
 
   const handleCloseDetailView = () => {
     setSelectedItem(null);
+
+    // Restore the state when closing the detailed view
+    StorageManager.getItem('appState').then((value) => {
+      if (value) {
+        const { activeTab, activeCategory, searchQuery, scrollPosition } = JSON.parse(value);
+        setActiveTab(activeTab);
+        setActiveCategory(activeCategory);
+        setSearchQuery(searchQuery);
+        window.scrollTo(0, scrollPosition);
+      }
+    }).catch((error) => {
+      console.error('Error retrieving state from storage:', error);
+    });
   };
 
   const renderTabContent = () => {

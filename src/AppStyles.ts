@@ -96,6 +96,22 @@ const layoutStyles = css`
     height: 60px;
     z-index: 20;
   }
+  .app-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--bottom-bar-bg-color);
+    height: 60px;
+    z-index: 20;
+  }
+  .app-card-detail-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+    background-color: var(--bg-color);
+    padding-bottom: 60px;
+  }
 `
 
 const componentStyles = css`
