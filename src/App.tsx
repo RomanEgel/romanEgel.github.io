@@ -4,6 +4,9 @@ import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search,
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { getTranslation, translations } from './localization';
+import { Global } from '@emotion/react'
+import { createAppStyles } from './AppStyles'
+import { responsiveStyles } from './AppResponsiveStyles'
 
 interface LocalsItem {
   id: number
@@ -371,7 +374,7 @@ function App({ community }: AppProps) {
               >
                 <Filter className="h-5 w-5" />
                 {activeCategory !== 'all' && (
-                  <span className="ml-2 text-sm truncate max-w-[100px] app-text">
+                  <span className="ml-2 text-sm truncate max-w-[100px] app-button-text">
                     {getCategoryDisplayName(activeCategory)}
                   </span>
                 )}

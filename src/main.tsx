@@ -11,22 +11,7 @@ import { AuthProvider } from './AuthContext';
 import { createAppStyles, ThemeColors } from './AppStyles';
 
 let initDataRawToUse: string;
-let themeColors: ThemeColors = {
-  bg_color: "#17212b",
-  text_color: "#f5f5f5",
-  button_color: "#5288c1",
-  button_text_color: "#ffffff",
-  hint_color: "#708499",
-  link_color: "#6ab3f3",
-  secondary_bg_color: "#232e3c",
-  subtitle_text_color: "#708499",
-  accent_text_color: "#6ab2f2",
-  destructive_text_color: "#ec3942",
-  header_bg_color: "#17212b",
-  section_bg_color: "#17212b",
-  section_header_text_color: "#6ab3f3",
-  section_separator_color: "#232e3c",
-};
+let themeColors: ThemeColors = {'bg_color': '#1e1e1e', 'text_color': '#ffffff', 'button_color': '#95c46c', 'button_text_color': '#ffffff', 'hint_color': '#7d7d7d', 'link_color': '#92bb6d', 'secondary_bg_color': '#000000', 'subtitle_text_color': '#7e7e7e', 'accent_text_color': '#9ec778', 'destructive_text_color': '#ee686f', 'header_bg_color': '#232523', 'section_bg_color': '#181918', 'section_header_text_color': '#a1cf7f', 'section_separator_color': '#000000'};
 
 if (import.meta.env.MODE === 'development') {
   initDataRawToUse = 'user=%7B%22id%22%3A6601444385%2C%22first_name%22%3A%22AI%20Knowledge%20Base%20App%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22ai_kbase_app%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%7D&chat_instance=8152347450021945498&chat_type=supergroup&start_param=-1002434020920&auth_date=1727102388&hash=5930aa55ebb2c4ae56bf39b3bf39d15d423010aaef46cfc43115e45bb6936b46';
