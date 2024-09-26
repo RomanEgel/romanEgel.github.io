@@ -100,6 +100,7 @@ function App({ community }: AppProps) {
   const sortButtonRef = useRef<HTMLButtonElement>(null)
   const filterDropdownRef = useRef<HTMLDivElement>(null)
   const sortDropdownRef = useRef<HTMLDivElement>(null)
+  const mainContentRef = useRef<HTMLDivElement>(null);
 
   const handleDocumentClick = useCallback((event: MouseEvent) => {
     if (
@@ -161,12 +162,16 @@ function App({ community }: AppProps) {
     });
   }, []);
 
-  // Function to update active tab and save it to StorageManager
+  // Modify the updateActiveTab function
   const updateActiveTab = (tab: TabType) => {
     setActiveTab(tab);
     StorageManager.setItem('lastActiveTab', tab).catch((error) => {
       console.error('Error saving to storage:', error);
     });
+    // Scroll to the top when changing tabs
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+    }
   };
 
   const getUniqueCategories = (items: ListItem[]) => {
@@ -475,8 +480,8 @@ function App({ community }: AppProps) {
           </div>
         </div>
 
-        <main className="flex-grow overflow-y-auto app-main-content">
-          <div className="container mx-auto px-4 pb-16"> {/* Add bottom padding */}
+        <main ref={mainContentRef} className="flex-grow overflow-y-auto app-main-content">
+          <div className="container mx-auto px-4 pb-16">
             {renderTabContent()}
           </div>
         </main>
