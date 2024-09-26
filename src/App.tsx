@@ -304,7 +304,9 @@ function App({ community }: AppProps) {
   }
 
   const [showNav, setShowNav] = useState(true);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const appContainerRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const visualViewport = window.visualViewport;
@@ -314,16 +316,33 @@ function App({ community }: AppProps) {
         if (appContainerRef.current) {
           const containerHeight = appContainerRef.current.offsetHeight;
           const visibleHeight = visualViewport.height;
-          setShowNav(containerHeight - visibleHeight < 100); // Adjust this threshold as needed
+          const heightDifference = containerHeight - visibleHeight;
+
+          if (isInputFocused && heightDifference > 100) {
+            setShowNav(false);
+          } else if (!isInputFocused || heightDifference < 100) {
+            setShowNav(true);
+          }
         }
       };
 
       visualViewport.addEventListener('resize', handleResize);
-      handleResize(); // Call once to set initial state
 
       return () => visualViewport.removeEventListener('resize', handleResize);
     }
-  }, []);
+  }, [isInputFocused]);
+
+  const handleInputFocus = () => {
+    setIsInputFocused(true);
+  };
+
+  const handleInputBlur = () => {
+    setIsInputFocused(false);
+    // Add a small delay to ensure the keyboard has time to close
+    setTimeout(() => {
+      setShowNav(true);
+    }, 100);
+  };
 
   return (
     <div className="min-h-screen flex flex-col app-body">
@@ -383,10 +402,13 @@ function App({ community }: AppProps) {
             </div>
             <div className="flex-grow relative">
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder={t('search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={handleInputBlur}
                 className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
