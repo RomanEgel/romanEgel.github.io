@@ -20,26 +20,27 @@ export const createAppStyles = (colors: ThemeColors) => css`
   .app-body {
     background-color: ${colors.bg_color};
     color: ${colors.text_color};
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .app-header {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: env(safe-area-inset-top);
+    left: env(safe-area-inset-left);
+    right: env(safe-area-inset-right);
     z-index: 20;
-    background-color: ${colors.bg_color};
+    background-color: ${colors.header_bg_color};
     padding: 0.5rem;
-    height: 40px; // Set a fixed height
+    height: 40px;
   }
   .app-filter-row {
     position: fixed;
-    top: 40px; // Positioned right below the header
-    left: 0;
-    right: 0;
+    top: calc(env(safe-area-inset-top) + 40px);
+    left: env(safe-area-inset-left);
+    right: env(safe-area-inset-right);
     z-index: 10;
-    background-color: ${colors.secondary_bg_color};
+    background-color: ${colors.bg_color};
     padding: 0.5rem 1rem;
-    height: 60px; // Set a fixed height
+    height: 60px;
   }
   .app-button {
     background-color: ${colors.button_color};
@@ -158,20 +159,20 @@ export const createAppStyles = (colors: ThemeColors) => css`
   }
 
   .app-main-content {
-    margin-top: 100px; // Adjusted to account for header (40px) and filter row (60px)
-    margin-bottom: 60px; // For the nav bar
+    margin-top: calc(env(safe-area-inset-top) + 100px);
+    margin-bottom: calc(60px + env(safe-area-inset-bottom));
     overflow-y: auto;
-    height: calc(100% - 160px); // Subtracting total height of header, filter row, and nav
+    height: calc(100% - 160px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 
   .app-nav {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: env(safe-area-inset-bottom);
+    left: env(safe-area-inset-left);
+    right: env(safe-area-inset-right);
     z-index: 20;
     background-color: ${colors.bg_color};
-    height: 60px; // Set a fixed height for the nav bar
+    height: 60px;
   }
 
   @media (min-width: 768px) {
@@ -220,6 +221,17 @@ export const createAppStyles = (colors: ThemeColors) => css`
       margin-bottom: 60px; // Adjust based on nav height
       height: calc(100% - 160px); // Adjusted for all fixed elements
       overflow-y: auto;
+    }
+  }
+
+  // Add this new media query
+  @media (max-height: 450px) {
+    .app-nav {
+      display: none;
+    }
+
+    .app-main-content {
+      margin-bottom: env(safe-area-inset-bottom);
     }
   }
 `

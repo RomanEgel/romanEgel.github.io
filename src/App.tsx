@@ -303,6 +303,19 @@ function App({ community }: AppProps) {
     )
   }
 
+  const [showNav, setShowNav] = useState(true);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowNav(window.innerHeight > 450);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call once to set initial state
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col app-body">
       <div className="flex-grow flex flex-col app-container">
@@ -417,22 +430,24 @@ function App({ community }: AppProps) {
           </div>
         </main>
 
-        <nav className="app-nav">
-          <div className="flex justify-around">
-            {['community', 'items', 'services', 'news'].map((tab) => (
-              <button
-                key={tab}
-                className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab as TabType)}
-              >
-                {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
-                {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
-                {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
-                {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
-              </button>
-            ))}
-          </div>
-        </nav>
+        {showNav && (
+          <nav className="app-nav">
+            <div className="flex justify-around">
+              {['community', 'items', 'services', 'news'].map((tab) => (
+                <button
+                  key={tab}
+                  className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab as TabType)}
+                >
+                  {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
+                  {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
+                  {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
+                  {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
       </div>
     </div>
   )
