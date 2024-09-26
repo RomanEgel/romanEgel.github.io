@@ -50,6 +50,25 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
     );
   };
 
+  const messageLink = `https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`;
+
+  let contactText;
+  switch (active_tab) {
+    case 'items':
+      contactText = t('interestedInItemMessage');
+      break;
+    case 'services':
+      contactText = t('interestedInServiceMessage');
+      break;
+    case 'events':
+      contactText = t('interestedInEventMessage');
+      break;
+    case 'news':
+      contactText = t('interestedInNewsMessage');
+      break;
+  }
+  const contactAuthorLink = `https://t.me/${item.username}?text=${encodeURIComponent(contactText + item.title)}`;
+
   return (
     <div className="flex-grow flex flex-col app-container">
       <div className="flex-grow overflow-y-auto app-card-detail-content">
@@ -92,7 +111,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
       <nav className="app-bottom-bar">
         <div className="flex justify-around">
           <button
-            onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
+            onClick={() => openTelegramLink(messageLink)}
             className="flex-1 py-4 app-button"
           >
             <MessageCircle className="h-5 w-5 inline-block mr-2" />
@@ -109,7 +128,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
             </button>
           ) : (
             <button
-              onClick={() => openTelegramLink(`https://t.me/${item.username}`)}
+              onClick={() => openTelegramLink(contactAuthorLink)}
               className="flex-1 py-4 app-button"
             >
               <UserCircle className="h-5 w-5 inline-block mr-2" />

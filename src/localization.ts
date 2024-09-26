@@ -20,6 +20,10 @@ export const translations = {
     price: 'Price',
     delete: 'Delete',
     deleteConfirmation: 'Are you sure you want to delete this item?',
+    interestedInItemMessage: "Hello, I'm interested in your item: ",
+    interestedInServiceMessage: "Hello, I'm interested in your service: ",
+    interestedInEventMessage: "Hello, I'm interested in the event: ",
+    interestedInNewsMessage: "Hello, I'm writing to you about the news: ",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -40,6 +44,10 @@ export const translations = {
     price: 'Цена',
     delete: 'Удалить',
     deleteConfirmation: 'Вы уверены, что хотите удалить этот элемент?',
+    interestedInItemMessage: 'Здравствуйте, пишу на счет вашего объявления: ',
+    interestedInServiceMessage: 'Здравствуйте, меня интересует услуга: ',
+    interestedInEventMessage: 'Здравствуйте, пишу на счет события: ',
+    interestedInNewsMessage: 'Здравствуйте, пишу на счет новости: ',
   },
 };
 
