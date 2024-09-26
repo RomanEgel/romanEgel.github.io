@@ -12,6 +12,9 @@ export const translations = {
     dateOldest: "Date (Oldest)",
     uponRequest: "Upon request",
     free: "Free",
+    'my items': 'My Items',
+    'my services': 'My Services',
+    'my events': 'My Events',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -24,6 +27,9 @@ export const translations = {
     dateOldest: "Дата (Старые)",
     uponRequest: "По запросу",
     free: "Бесплатно",
+    'my items': 'Мои товары',
+    'my services': 'Мои услуги',
+    'my events': 'Мои события',
   },
 };
 

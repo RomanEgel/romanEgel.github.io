@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search, Newspaper } from 'lucide-react'
+import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Settings } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { getTranslation, translations } from './localization';
@@ -63,8 +63,7 @@ interface LocalsNews {
   messageId: number
 }
 
-type TabType = 'community' | 'items' | 'services' | 'news'
-type SortType = 'relevance' | 'dateAsc'
+type TabType = 'events' | 'items' | 'services' | 'news'
 type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 
 interface LocalsCommunity {
@@ -83,12 +82,11 @@ interface AppProps {
   user: LocalsUser;
 }
 
-function App({ community }: AppProps) {
+function App({ community, user }: AppProps) {
   const { authorization } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabType>('community')
-  const [sortBy, setSortBy] = useState<SortType>('relevance')
+  const [activeTab, setActiveTab] = useState<TabType>('events')
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [activeDropdown, setActiveDropdown] = useState<'filter' | 'sort' | null>(null)
+  const [activeDropdown, setActiveDropdown] = useState<'filter' | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>('')
 
   const [items, setItems] = useState<LocalsItem[]>([])
@@ -97,22 +95,14 @@ function App({ community }: AppProps) {
   const [news, setNews] = useState<LocalsNews[]>([])
 
   const filterButtonRef = useRef<HTMLButtonElement>(null)
-  const sortButtonRef = useRef<HTMLButtonElement>(null)
   const filterDropdownRef = useRef<HTMLDivElement>(null)
-  const sortDropdownRef = useRef<HTMLDivElement>(null)
 
   const handleDocumentClick = useCallback((event: MouseEvent) => {
-    if (
-      filterButtonRef.current?.contains(event.target as Node) ||
-      sortButtonRef.current?.contains(event.target as Node)
-    ) {
+    if (filterButtonRef.current?.contains(event.target as Node)) {
       return;
     }
 
-    if (
-      !filterDropdownRef.current?.contains(event.target as Node) &&
-      !sortDropdownRef.current?.contains(event.target as Node)
-    ) {
+    if (!filterDropdownRef.current?.contains(event.target as Node)) {
       setActiveDropdown(null);
     }
   }, []);
@@ -124,11 +114,18 @@ function App({ community }: AppProps) {
     };
   }, [handleDocumentClick]);
 
-  const toggleDropdown = (dropdown: 'filter' | 'sort') => {
+  const toggleDropdown = (dropdown: 'filter') => {
     setActiveDropdown(prevDropdown => prevDropdown === dropdown ? null : dropdown);
   };
 
   const getCategoryDisplayName = (category: string) => {
+    if (category === 'all') {
+      return t('all');
+    }
+    if (category.startsWith('my ')) {
+      const type = category.split(' ')[1];
+      return t(`my ${type}` as keyof typeof translations.en);
+    }
     return category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   }
 
@@ -181,26 +178,34 @@ function App({ community }: AppProps) {
 
   const getCategories = () => {
     let result: ListItem[] = 
-      activeTab === 'community' ? events : 
+      activeTab === 'events' ? events : 
       activeTab === 'items' ? items : 
       activeTab === 'services' ? services :
       news;
 
     const uniqueCategories = getUniqueCategories(result);
-    return ['all', ...uniqueCategories];
+    const categories = ['all', ...uniqueCategories];
+
+    // Add "My items/services/events" category if user has any records
+    const hasUserRecords = result.some(item => item.username === user.username);
+    if (hasUserRecords) {
+      categories.unshift(`my ${activeTab}`);
+    }
+
+    return categories;
   };
 
-  const categories = useMemo(() => getCategories(), [activeTab, items, services, events, news]);
+  const categories = useMemo(() => getCategories(), [activeTab, items, services, events, news, user.username]);
 
-  const filteredAndSortedItems = useMemo(() => {
+  const filteredItems = useMemo(() => {
     let result: ListItem[] = 
-      activeTab === 'community' ? events : 
+      activeTab === 'events' ? events : 
       activeTab === 'items' ? items : 
       activeTab === 'services' ? services :
       news
 
-    if (activeCategory === 'my events' || activeCategory === 'my items' || activeCategory === 'my services') {
-      result = result.filter(item => item.id % 2 === 0)
+    if (activeCategory.startsWith('my ')) {
+      result = result.filter(item => item.username === user.username)
     } else if (activeCategory !== 'all') {
       result = result.filter(item => item.category === activeCategory)
     }
@@ -214,13 +219,8 @@ function App({ community }: AppProps) {
       )
     }
 
-    return result.sort((a, b) => {
-      if (sortBy === 'dateAsc') {
-        return new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
-      }
-      return 0
-    })
-  }, [activeTab, activeCategory, sortBy, searchQuery, items, services, events, news])
+    return result
+  }, [activeTab, activeCategory, searchQuery, items, services, events, news, user.username])
 
   useEffect(() => {
     setActiveCategory('all')
@@ -267,7 +267,7 @@ function App({ community }: AppProps) {
   };
 
   const renderTabContent = () => {
-    if (filteredAndSortedItems.length === 0) {
+    if (filteredItems.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
           <p className="text-center app-hint">{t('noRecordsFound')}</p>
@@ -276,11 +276,11 @@ function App({ community }: AppProps) {
     }
     return (
       <div className="flex flex-col space-y-4 mb-16 w-full">
-        {filteredAndSortedItems.map((item) => (
+        {filteredItems.map((item) => (
           <div 
             key={item.id} 
             onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
-            className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card"
+            className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >
             <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
               <img 
@@ -319,6 +319,11 @@ function App({ community }: AppProps) {
                 </p>
               </div>
             </div>
+            {item.username === user.username && (
+              <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1 rounded-full">
+                <UserCircle2 className="h-4 w-4" />
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -377,7 +382,7 @@ function App({ community }: AppProps) {
             </div>
             <div className="flex items-center">
               <button className="p-1 rounded-full app-button">
-                <User className="h-5 w-5" />
+                <Settings className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -415,7 +420,7 @@ function App({ community }: AppProps) {
                           setActiveDropdown(null)
                         }}
                       >
-                        {category === 'all' ? t('all') : getCategoryDisplayName(category)}
+                        {getCategoryDisplayName(category)}
                       </a>
                     ))}
                   </div>
@@ -435,45 +440,6 @@ function App({ community }: AppProps) {
               />
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
             </div>
-            <div className="relative">
-              <button 
-                ref={sortButtonRef}
-                className="p-2 rounded-lg flex items-center app-button"
-                onClick={() => toggleDropdown('sort')}
-              >
-                <SortAsc className="h-5 w-5" />
-              </button>
-              {activeDropdown === 'sort' && (
-                <div 
-                  ref={sortDropdownRef} 
-                  className="absolute right-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
-                >
-                  <div className="py-1">
-                    <p className="px-4 py-2 text-sm app-hint">{t('sortResults')}</p>
-                    <a
-                      href="#"
-                      className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'relevance' ? 'active' : ''}`}
-                      onClick={() => {
-                        setSortBy('relevance')
-                        setActiveDropdown(null)
-                      }}
-                    >
-                      {t('relevance')}
-                    </a>
-                    <a
-                      href="#"
-                      className={`block px-4 py-2 text-sm app-dropdown-item ${sortBy === 'dateAsc' ? 'active' : ''}`}
-                      onClick={() => {
-                        setSortBy('dateAsc')
-                        setActiveDropdown(null)
-                      }}
-                    >
-                      {t('dateOldest')}
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
 
@@ -486,13 +452,13 @@ function App({ community }: AppProps) {
         {showNav && (
           <nav className="app-nav">
             <div className="flex justify-around">
-              {['community', 'items', 'services', 'news'].map((tab) => (
+              {['events', 'items', 'services', 'news'].map((tab) => (
                 <button
                   key={tab}
                   className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
                   onClick={() => updateActiveTab(tab as TabType)}
                 >
-                  {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
+                  {tab === 'events' && <Calendar className="h-6 w-6 mx-auto" />}
                   {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
                   {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
                   {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
