@@ -3,7 +3,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Settings } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
-import { getTranslation, translations } from './localization';
+import { translations } from './localization';
 import StorageManager from './StorageManager';
 import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
