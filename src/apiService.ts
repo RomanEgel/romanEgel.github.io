@@ -61,7 +61,7 @@ export async function sendThemeParams(themeParams: any): Promise<void> {
 }
 
 export async function deleteItem(itemId: string, authorization: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/items/${itemId}`, {
+  await fetch(`${API_BASE_URL}/api/items/${itemId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `tma ${authorization}`
@@ -71,7 +71,7 @@ export async function deleteItem(itemId: string, authorization: string): Promise
 }
 
 export async function deleteService(serviceId: string, authorization: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, {
+  await fetch(`${API_BASE_URL}/api/services/${serviceId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `tma ${authorization}`
@@ -81,7 +81,7 @@ export async function deleteService(serviceId: string, authorization: string): P
 }
 
 export async function deleteEvent(eventId: string, authorization: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
+  await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `tma ${authorization}`
@@ -91,7 +91,7 @@ export async function deleteEvent(eventId: string, authorization: string): Promi
 }
 
 export async function deleteNews(newsId: string, authorization: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/news/${newsId}`, {
+  await fetch(`${API_BASE_URL}/api/news/${newsId}`, {
     method: 'DELETE',
     headers: {
       Authorization: `tma ${authorization}`
