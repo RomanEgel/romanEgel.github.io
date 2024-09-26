@@ -100,7 +100,6 @@ function App({ community }: AppProps) {
   const sortButtonRef = useRef<HTMLButtonElement>(null)
   const filterDropdownRef = useRef<HTMLDivElement>(null)
   const sortDropdownRef = useRef<HTMLDivElement>(null)
-  const mainContentRef = useRef<HTMLDivElement>(null);
 
   const handleDocumentClick = useCallback((event: MouseEvent) => {
     if (
@@ -168,10 +167,8 @@ function App({ community }: AppProps) {
     StorageManager.setItem('lastActiveTab', tab).catch((error) => {
       console.error('Error saving to storage:', error);
     });
-    // Scroll to the top when changing tabs
-    if (mainContentRef.current) {
-      mainContentRef.current.scrollTop = 0;
-    }
+    // Scroll to the top of the window when changing tabs
+    window.scrollTo(0, 0);
   };
 
   const getUniqueCategories = (items: ListItem[]) => {
@@ -480,7 +477,7 @@ function App({ community }: AppProps) {
           </div>
         </div>
 
-        <main ref={mainContentRef} className="flex-grow overflow-y-auto app-main-content">
+        <main className="flex-grow overflow-y-auto app-main-content">
           <div className="container mx-auto px-4 pb-16">
             {renderTabContent()}
           </div>
