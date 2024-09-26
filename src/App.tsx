@@ -83,7 +83,7 @@ interface AppProps {
   user: LocalsUser;
 }
 
-function App({ community, user }: AppProps) {
+function App({ community }: AppProps) {
   const { authorization } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('community')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
