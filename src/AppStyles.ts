@@ -14,11 +14,12 @@ export interface ThemeColors {
   header_bg_color: string;
   section_bg_color: string;
   section_header_text_color: string;
+  section_separator_color: string;
 }
 
 export const createAppStyles = (colors: ThemeColors) => css`
   .app-body {
-    background-color: ${colors.bg_color};
+    background-color: ${colors.secondary_bg_color};
     color: ${colors.text_color};
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -28,8 +29,8 @@ export const createAppStyles = (colors: ThemeColors) => css`
     left: env(safe-area-inset-left);
     right: env(safe-area-inset-right);
     z-index: 20;
-    background-color: ${colors.header_bg_color};
-    color: ${colors.accent_text_color};
+    background-color: ${colors.bg_color};
+    color: ${colors.text_color};
     padding: 0.5rem;
     height: 40px;
   }
@@ -51,7 +52,7 @@ export const createAppStyles = (colors: ThemeColors) => css`
     }
   }
   .app-input {
-    background-color: ${colors.secondary_bg_color};
+    background-color: ${colors.section_bg_color};
     color: ${colors.text_color};
     &::placeholder {
       color: ${colors.hint_color};
@@ -64,7 +65,7 @@ export const createAppStyles = (colors: ThemeColors) => css`
     }
   }
   .app-card {
-    background-color: ${colors.secondary_bg_color};
+    background-color: ${colors.section_separator_color};
     border: 1px solid ${colors.hint_color}33; // 33 for 20% opacity
   }
   .app-hint {

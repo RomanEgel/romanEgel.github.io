@@ -25,6 +25,7 @@ let themeColors: ThemeColors = {
   header_bg_color: "#17212b",
   section_bg_color: "#17212b",
   section_header_text_color: "#6ab3f3",
+  section_separator_color: "#232e3c",
 };
 
 if (import.meta.env.MODE === 'development') {
@@ -46,6 +47,7 @@ if (import.meta.env.MODE === 'development') {
     header_bg_color: themeParams['headerBgColor'] || themeColors.header_bg_color,
     section_bg_color: themeParams['sectionBgColor'] || themeColors.section_bg_color,
     section_header_text_color: themeParams['sectionHeaderTextColor'] || themeColors.section_header_text_color,
+    section_separator_color: themeParams['sectionSeparatorColor'] || themeColors.section_separator_color,
   };
 }
 
