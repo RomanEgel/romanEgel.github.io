@@ -350,8 +350,8 @@ function App({ community }: AppProps) {
         <header className="app-header">
           <div className="flex justify-between items-center text-center">
             <div className="flex items-center">
-              <MapPin className="h-4 w-4 mr-1 app-link" />
-              <span className="text-sm app-text">{community.name}</span>
+              <MapPin className="h-4 w-4 mr-1" />
+              <span className="text-sm">{community.name}</span>
             </div>
             <div className="flex items-center">
               <button className="p-1 rounded-full app-button">
