@@ -22,12 +22,24 @@ export const createAppStyles = (colors: ThemeColors) => css`
     color: ${colors.text_color};
   }
   .app-header {
-    background-color: ${colors.header_bg_color};
-    color: ${colors.text_color};
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background-color: ${colors.bg_color};
+    padding: 0.5rem;
+    height: 40px; // Set a fixed height
   }
   .app-filter-row {
+    position: fixed;
+    top: 40px; // Positioned right below the header
+    left: 0;
+    right: 0;
+    z-index: 10;
     background-color: ${colors.secondary_bg_color};
-    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+    height: 60px; // Set a fixed height
   }
   .app-button {
     background-color: ${colors.button_color};
@@ -142,16 +154,23 @@ export const createAppStyles = (colors: ThemeColors) => css`
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    position: relative; // Add this to create a positioning context
+    position: relative;
   }
 
-  main {
-    flex-grow: 1;
+  .app-main-content {
+    margin-top: 100px; // Adjusted to account for header (40px) and filter row (60px)
+    margin-bottom: 60px; // For the nav bar
     overflow-y: auto;
-    padding-bottom: 60px; // Add padding to account for the fixed nav bar
+    height: calc(100% - 160px); // Subtracting total height of header, filter row, and nav
   }
 
-  nav.app-header {
+  .app-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background-color: ${colors.bg_color};
     height: 60px; // Set a fixed height for the nav bar
   }
 
@@ -176,11 +195,31 @@ export const createAppStyles = (colors: ThemeColors) => css`
       overflow: hidden; // Ensure content doesn't overflow the rounded corners
     }
 
-    nav.app-header {
-      position: absolute; // Change to absolute positioning within the container
-      bottom: 0;
+    .app-header,
+    .app-filter-row,
+    .app-nav {
+      position: absolute;
       left: 0;
       right: 0;
+    }
+
+    .app-header {
+      top: 0;
+    }
+
+    .app-filter-row {
+      top: 40px; // Adjust based on your header height
+    }
+
+    .app-nav {
+      bottom: 0;
+    }
+
+    .app-main-content {
+      margin-top: 100px; // Adjusted for header and filter row
+      margin-bottom: 60px; // Adjust based on nav height
+      height: calc(100% - 160px); // Adjusted for all fixed elements
+      overflow-y: auto;
     }
   }
 `
