@@ -137,7 +137,6 @@ const componentStyles = css`
   }
   .app-card {
     background-color: var(--section-bg-color);
-    border: 1px solid var(--section-separator-color);
   }
   .app-dropdown {
     background-color: var(--secondary-bg-color);
