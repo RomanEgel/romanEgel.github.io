@@ -5,6 +5,8 @@ import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { getTranslation, translations } from './localization';
 import StorageManager from './StorageManager';
+import CardDetailView from './CardDetailView';
+import { formatDate, formatPrice, createTranslationFunction } from './utils';
 
 interface LocalsItem {
   id: number
@@ -231,39 +233,16 @@ function App({ community, user }: AppProps) {
     WebApp.openLink(url);
   };
 
-  const formatDate = (dateString: string, isEventDate: boolean = false) => {
-    const options: Intl.DateTimeFormatOptions = { 
-      weekday: 'short', 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      ...(isEventDate ? { timeZone: 'UTC' } : {})
-    };
-    
-    const locale = community.language === 'ru' ? 'ru-RU' : 'en-US';
-    return new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
+  const t = createTranslationFunction(community.language);
+
+  const [selectedItem, setSelectedItem] = useState<ListItem | null>(null);
+
+  const handleItemClick = (item: ListItem) => {
+    setSelectedItem(item);
   };
 
-  const t = (key: keyof typeof translations.en) => getTranslation(key, community.language);
-
-  const formatPrice = (price: number | null | undefined, currency: string | null | undefined) => {
-    if (price === null || price === undefined) {
-      return t('uponRequest');
-    }
-    if (price === 0) {
-      return t('free');
-    }
-    if (currency === null || currency === undefined) {
-      return `${price}`;  // Return just the price if currency is not available
-    }
-    if (currency === 'USD') {
-      return `$${price.toFixed(2)}`;
-    } else if (currency === 'RUB') {
-      return `${Math.round(price)} ₽`;
-    }
-    return `${price} ${currency}`;  // Fallback for any other currency
+  const handleCloseDetailView = () => {
+    setSelectedItem(null);
   };
 
   const renderTabContent = () => {
@@ -279,7 +258,7 @@ function App({ community, user }: AppProps) {
         {filteredItems.map((item) => (
           <div 
             key={item.id} 
-            onClick={() => openTelegramLink(`https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`)}
+            onClick={() => handleItemClick(item)}
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >
             <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
@@ -298,12 +277,12 @@ function App({ community, user }: AppProps) {
               <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
               {'price' in item && 'currency' in item && (
                 <p className="font-bold app-price text-sm">
-                  {formatPrice(item.price, item.currency)}
+                  {formatPrice(item.price, item.currency, community.language)}
                 </p>
               )}
               {'date' in item && (
                 <p className="font-bold app-event-date text-sm">
-                  {formatDate(item.date, true)}
+                  {formatDate(item.date, true, community.language)}
                 </p>
               )}
               <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
@@ -320,7 +299,7 @@ function App({ community, user }: AppProps) {
                   </span>
                 </p>
                 <p className="whitespace-nowrap app-publication-date">
-                  {formatDate(item.publishedAt)}
+                  {formatDate(item.publishedAt, false, community.language)}
                 </p>
               </div>
             </div>
@@ -373,101 +352,109 @@ function App({ community, user }: AppProps) {
 
   return (
     <div className="min-h-screen flex flex-col app-body">
-      <div ref={appContainerRef} className="flex-grow flex flex-col app-container">
-        <header className="app-header">
-          <div className="flex justify-between items-center text-center">
-            <div className="flex items-center">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span className="text-sm">{community.name}</span>
-            </div>
-            <div className="flex items-center">
-              <button className="p-1 rounded-full app-button">
-                <Settings className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <div className="app-filter-row">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <button 
-                ref={filterButtonRef}
-                className="p-2 rounded-lg flex items-center justify-center app-button"
-                onClick={() => toggleDropdown('filter')}
-              >
-                <Filter className="h-5 w-5" />
-                {activeCategory !== 'all' && (
-                  <span className="ml-2 text-sm truncate max-w-[100px] app-button-text">
-                    {getCategoryDisplayName(activeCategory)}
-                  </span>
-                )}
-              </button>
-              {activeDropdown === 'filter' && (
-                <div 
-                  ref={filterDropdownRef} 
-                  className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
-                >
-                  <div className="py-1">
-                    <p className="px-4 py-2 text-sm app-hint">{t('filterByCategory')}</p>
-                    {categories.map((category) => (
-                      <a
-                        key={category}
-                        href="#"
-                        className={`block px-4 py-2 text-sm app-dropdown-item ${activeCategory === category ? 'active' : ''}`}
-                        onClick={() => {
-                          setActiveCategory(category)
-                          setActiveDropdown(null)
-                        }}
-                      >
-                        {getCategoryDisplayName(category)}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="flex-grow relative">
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder={t('search')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
-                className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
-            </div>
-          </div>
-        </div>
-
-        <main className="flex-grow overflow-y-auto app-main-content">
-          <div className="container mx-auto px-4 pb-16">
-            {renderTabContent()}
-          </div>
-        </main>
-
-        {showNav && (
-          <nav className="app-nav">
-            <div className="flex justify-around">
-              {['events', 'items', 'services', 'news'].map((tab) => (
-                <button
-                  key={tab}
-                  className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
-                  onClick={() => updateActiveTab(tab as TabType)}
-                >
-                  {tab === 'events' && <Calendar className="h-6 w-6 mx-auto" />}
-                  {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
-                  {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
-                  {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
+      {selectedItem ? (
+        <CardDetailView
+          item={selectedItem}
+          onClose={handleCloseDetailView}
+          communityLanguage={community.language}
+        />
+      ) : (
+        <div ref={appContainerRef} className="flex-grow flex flex-col app-container">
+          <header className="app-header">
+            <div className="flex justify-between items-center text-center">
+              <div className="flex items-center">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span className="text-sm">{community.name}</span>
+              </div>
+              <div className="flex items-center">
+                <button className="p-1 rounded-full app-button">
+                  <Settings className="h-5 w-5" />
                 </button>
-              ))}
+              </div>
             </div>
-          </nav>
-        )}
-      </div>
+          </header>
+
+          <div className="app-filter-row">
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <button 
+                  ref={filterButtonRef}
+                  className="p-2 rounded-lg flex items-center justify-center app-button"
+                  onClick={() => toggleDropdown('filter')}
+                >
+                  <Filter className="h-5 w-5" />
+                  {activeCategory !== 'all' && (
+                    <span className="ml-2 text-sm truncate max-w-[100px] app-button-text">
+                      {getCategoryDisplayName(activeCategory)}
+                    </span>
+                  )}
+                </button>
+                {activeDropdown === 'filter' && (
+                  <div 
+                    ref={filterDropdownRef} 
+                    className="absolute left-0 top-full mt-1 w-56 rounded-md shadow-lg app-dropdown focus:outline-none z-50"
+                  >
+                    <div className="py-1">
+                      <p className="px-4 py-2 text-sm app-hint">{t('filterByCategory')}</p>
+                      {categories.map((category) => (
+                        <a
+                          key={category}
+                          href="#"
+                          className={`block px-4 py-2 text-sm app-dropdown-item ${activeCategory === category ? 'active' : ''}`}
+                          onClick={() => {
+                            setActiveCategory(category)
+                            setActiveDropdown(null)
+                          }}
+                        >
+                          {getCategoryDisplayName(category)}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="flex-grow relative">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={t('search')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
+              </div>
+            </div>
+          </div>
+
+          <main className="flex-grow overflow-y-auto app-main-content">
+            <div className="container mx-auto px-4 pb-16">
+              {renderTabContent()}
+            </div>
+          </main>
+
+          {showNav && (
+            <nav className="app-nav">
+              <div className="flex justify-around">
+                {['events', 'items', 'services', 'news'].map((tab) => (
+                  <button
+                    key={tab}
+                    className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
+                    onClick={() => updateActiveTab(tab as TabType)}
+                  >
+                    {tab === 'events' && <Calendar className="h-6 w-6 mx-auto" />}
+                    {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}
+                    {tab === 'services' && <HeartHandshake className="h-6 w-6 mx-auto" />}
+                    {tab === 'news' && <Newspaper className="h-6 w-6 mx-auto" />}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -15,6 +15,8 @@ export const translations = {
     'my items': 'My Items',
     'my services': 'My Services',
     'my events': 'My Events',
+    viewInChat: "View in Chat",
+    contactAuthor: "Contact Author",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -30,6 +32,8 @@ export const translations = {
     'my items': 'Мои товары',
     'my services': 'Мои услуги',
     'my events': 'Мои события',
+    viewInChat: "Посмотреть в чате",
+    contactAuthor: "Связаться с автором",
   },
 };
 
