@@ -6,7 +6,7 @@ import './index.css'
 
 import WebApp from '@twa-dev/sdk'
 import { retrieveLaunchParams } from '@telegram-apps/sdk';
-import { validateAuthorization } from './apiService';
+import { validateAuthorization, sendThemeParams } from './apiService';
 import { AuthProvider } from './AuthContext';
 import { createAppStyles, ThemeColors } from './AppStyles';
 
@@ -32,6 +32,7 @@ if (import.meta.env.MODE === 'development') {
   initDataRawToUse = 'user=%7B%22id%22%3A6601444385%2C%22first_name%22%3A%22AI%20Knowledge%20Base%20App%22%2C%22last_name%22%3A%22%22%2C%22username%22%3A%22ai_kbase_app%22%2C%22language_code%22%3A%22en%22%2C%22allows_write_to_pm%22%3Atrue%7D&chat_instance=8152347450021945498&chat_type=supergroup&start_param=-1002434020920&auth_date=1727102388&hash=5930aa55ebb2c4ae56bf39b3bf39d15d423010aaef46cfc43115e45bb6936b46';
 } else {
   const { initDataRaw, themeParams } = retrieveLaunchParams();
+  
   initDataRawToUse = initDataRaw || '';
   themeColors = {
     bg_color: themeParams['bgColor'] || themeColors.bg_color,
@@ -49,6 +50,11 @@ if (import.meta.env.MODE === 'development') {
     section_header_text_color: themeParams['sectionHeaderTextColor'] || themeColors.section_header_text_color,
     section_separator_color: themeParams['sectionSeparatorColor'] || themeColors.section_separator_color,
   };
+
+  // Send theme parameters to the backend
+  sendThemeParams(themeColors)
+    .then(() => console.log('Theme parameters sent to backend'))
+    .catch(error => console.error('Error sending theme parameters:', error));
 }
 
 if (!initDataRawToUse || !initDataRawToUse.includes('start_param')) {
