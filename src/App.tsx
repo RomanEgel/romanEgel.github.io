@@ -4,9 +4,6 @@ import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search,
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { getTranslation, translations } from './localization';
-import { Global } from '@emotion/react'
-import { createAppStyles } from './AppStyles'
-import { responsiveStyles } from './AppResponsiveStyles'
 
 interface LocalsItem {
   id: number
