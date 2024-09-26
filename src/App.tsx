@@ -4,6 +4,7 @@ import { User, Store, HeartHandshake, Calendar, MapPin, Filter, SortAsc, Search,
 import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { getTranslation, translations } from './localization';
+import StorageManager from './StorageManager';
 
 interface LocalsItem {
   id: number
@@ -69,16 +70,20 @@ type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 interface LocalsCommunity {
   id: number;
   name: string;
-  description: string;
-  membersCount: number;
   language: 'en' | 'ru';  // Add this line
+}
+interface LocalsUser {
+  first_name: string;
+  last_name: string;
+  username: string;
 }
 
 interface AppProps {
   community: LocalsCommunity;
+  user: LocalsUser;
 }
 
-function App({ community }: AppProps) {
+function App({ community, user }: AppProps) {
   const { authorization } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('community')
   const [sortBy, setSortBy] = useState<SortType>('relevance')
@@ -147,7 +152,22 @@ function App({ community }: AppProps) {
 
   useEffect(() => {
     fetchData();
+    
+    // Retrieve the last active tab from StorageManager
+    StorageManager.getItem('lastActiveTab').then((value) => {
+      if (value) {
+        setActiveTab(value as TabType);
+      }
+    });
   }, []);
+
+  // Function to update active tab and save it to StorageManager
+  const updateActiveTab = (tab: TabType) => {
+    setActiveTab(tab);
+    StorageManager.setItem('lastActiveTab', tab).catch((error) => {
+      console.error('Error saving to storage:', error);
+    });
+  };
 
   const getUniqueCategories = (items: ListItem[]) => {
     const categories = new Set<string>();
@@ -468,7 +488,7 @@ function App({ community }: AppProps) {
                 <button
                   key={tab}
                   className={`flex-1 py-4 app-nav-item ${activeTab === tab ? 'active' : ''}`}
-                  onClick={() => setActiveTab(tab as TabType)}
+                  onClick={() => updateActiveTab(tab as TabType)}
                 >
                   {tab === 'community' && <Calendar className="h-6 w-6 mx-auto" />}
                   {tab === 'items' && <Store className="h-6 w-6 mx-auto" />}

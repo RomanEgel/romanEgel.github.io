@@ -12,6 +12,7 @@ export interface ThemeColors {
   accent_text_color: string;
   destructive_text_color: string;
   header_bg_color: string;
+  buttom_bg_color: string;
   section_bg_color: string;
   section_header_text_color: string;
   section_separator_color: string;
@@ -48,6 +49,7 @@ const createCSSVariables = (colors: ThemeColors) => `
     --accent-text-color: ${colors.accent_text_color};
     --destructive-text-color: ${colors.destructive_text_color};
     --header-bg-color: ${colors.header_bg_color};
+    --buttom-bg-color: ${colors.buttom_bg_color};
     --header-text-color: ${isLightColor(colors.header_bg_color) ? '#000000' : '#ffffff'};
     --section-bg-color: ${colors.section_bg_color};
     --section-header-text-color: ${colors.section_header_text_color};
@@ -107,7 +109,7 @@ const layoutStyles = css`
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: var(--bg-color);
+    background-color: var(--buttom-bg-color);
     height: 60px;
     z-index: 20;
   }
