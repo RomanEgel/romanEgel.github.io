@@ -1,4 +1,5 @@
 import { getTranslation, translations } from './localization';
+import WebApp from '@twa-dev/sdk';
 
 export const formatDate = (dateString: string, isEventDate: boolean = false, language: 'en' | 'ru') => {
   const options: Intl.DateTimeFormatOptions = { 
@@ -37,4 +38,15 @@ export const formatPrice = (price: number | null | undefined, currency: string |
 
 export const createTranslationFunction = (language: 'en' | 'ru') => {
   return (key: keyof typeof translations.en) => getTranslation(key, language);
+};
+
+export const showConfirm = (message: string, callback: (result: boolean) => void) => {
+  if (import.meta.env.MODE === 'development') {
+    const result = window.confirm(message);
+    callback(result);
+  } else {
+    WebApp.showConfirm(message, (result: boolean) => {
+      callback(result);
+    });
+  }
 };

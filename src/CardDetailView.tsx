@@ -1,16 +1,26 @@
 import React, { useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-import { MessageCircle, UserCircle } from 'lucide-react';
+import { MessageCircle, UserCircle, Trash2 } from 'lucide-react';
 import { ListItem } from './types';
-import { formatDate, formatPrice, createTranslationFunction } from './utils';
+import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 
 interface CardDetailViewProps {
   item: ListItem;
+  active_tab: string;
   onClose: () => void;
   communityLanguage: 'en' | 'ru';
+  isCurrentUserAuthor: boolean; // New prop
+  onDelete?: (item_id: string, item_type: string) => void; // New prop for delete functionality
 }
 
-const CardDetailView: React.FC<CardDetailViewProps> = ({ item, onClose, communityLanguage }) => {
+const CardDetailView: React.FC<CardDetailViewProps> = ({ 
+  item, 
+  active_tab,
+  onClose, 
+  communityLanguage, 
+  isCurrentUserAuthor,
+  onDelete
+}) => {
   const t = createTranslationFunction(communityLanguage);
 
   useEffect(() => {
@@ -27,6 +37,17 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({ item, onClose, communit
 
   const openTelegramLink = (url: string) => {
     WebApp.openTelegramLink(url);
+  };
+
+  const handleDelete = () => {
+    showConfirm(
+      t('deleteConfirmation'),
+      (confirmed: boolean) => {
+        if (confirmed && onDelete) {
+          onDelete(item.id, active_tab);
+        }
+      }
+    );
   };
 
   return (
@@ -78,13 +99,23 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({ item, onClose, communit
             <span>{t('viewInChat')}</span>
           </button>
           <div className="w-0.5"/>
-          <button
-            onClick={() => openTelegramLink(`https://t.me/${item.username}`)}
-            className="flex-1 py-4 app-button"
-          >
-            <UserCircle className="h-5 w-5 inline-block mr-2" />
-            <span>{t('contactAuthor')}</span>
-          </button>
+          {isCurrentUserAuthor ? (
+            <button
+              onClick={handleDelete}
+              className="flex-1 py-4 app-button app-button-delete"
+            >
+              <Trash2 className="h-5 w-5 inline-block mr-2" />
+              <span>{t('delete')}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => openTelegramLink(`https://t.me/${item.username}`)}
+              className="flex-1 py-4 app-button"
+            >
+              <UserCircle className="h-5 w-5 inline-block mr-2" />
+              <span>{t('contactAuthor')}</span>
+            </button>
+          )}
         </div>
       </nav>
     </div>

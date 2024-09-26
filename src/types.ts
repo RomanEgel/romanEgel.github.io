@@ -1,7 +1,7 @@
 export type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 
 interface BaseItem {
-  id: number;
+  id: string;
   title: string;
   image: string;
   author: string;

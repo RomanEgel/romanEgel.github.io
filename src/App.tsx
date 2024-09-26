@@ -1,7 +1,7 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Settings } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews } from './apiService'
+import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
 import StorageManager from './StorageManager';
@@ -9,7 +9,7 @@ import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
 
 interface LocalsItem {
-  id: number
+  id: string
   title: string
   price: number
   currency: string
@@ -24,7 +24,7 @@ interface LocalsItem {
 }
 
 interface LocalsService {
-  id: number
+  id: string
   title: string
   price: number
   currency: string
@@ -39,7 +39,7 @@ interface LocalsService {
 }
 
 interface LocalsEvent {
-  id: number
+  id: string
   title: string
   date: string
   image: string
@@ -53,7 +53,7 @@ interface LocalsEvent {
 }
 
 interface LocalsNews {
-  id: number
+  id: string
   title: string
   image: string
   author: string
@@ -374,13 +374,52 @@ function App({ community, user }: AppProps) {
     }, 100);
   };
 
+  const [reloadData, setReloadData] = useState(false);
+
+  useEffect(() => {
+    if (reloadData) {
+      fetchData();
+      setReloadData(false);
+    }
+  }, [reloadData]);
+
+  const handleDeleteItem = async (item_id: string, active_tab: string) => {
+    try {
+      switch (active_tab) {
+        case 'items':
+          await deleteItem(item_id, authorization);
+          break;
+        case 'services':
+          await deleteService(item_id, authorization);
+          break;
+        case 'events':
+          await deleteEvent(item_id, authorization);
+          break;
+        case 'news':
+          await deleteNews(item_id, authorization);
+          break;
+      }
+      
+      // Set the reload flag to true
+      setReloadData(true);
+      
+      setSelectedItem(null);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      // Optionally, you can add error handling here, such as showing an error message to the user
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col app-body">
       {selectedItem ? (
         <CardDetailView
           item={selectedItem}
+          active_tab={activeTab}
           onClose={handleCloseDetailView}
           communityLanguage={community.language}
+          isCurrentUserAuthor={selectedItem.username === user.username}
+          onDelete={handleDeleteItem}
         />
       ) : (
         <div ref={appContainerRef} className="flex-grow flex flex-col app-container">

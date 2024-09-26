@@ -59,3 +59,43 @@ export async function sendThemeParams(themeParams: any): Promise<void> {
     throw new Error('Failed to send theme parameters');
   }
 }
+
+export async function deleteItem(itemId: string, authorization: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/items/${itemId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `tma ${authorization}`
+    }
+  });
+  
+}
+
+export async function deleteService(serviceId: string, authorization: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/services/${serviceId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `tma ${authorization}`
+    }
+  });
+  
+}
+
+export async function deleteEvent(eventId: string, authorization: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/events/${eventId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `tma ${authorization}`
+    }
+  });
+  
+}
+
+export async function deleteNews(newsId: string, authorization: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/news/${newsId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `tma ${authorization}`
+    }
+  });
+  
+}

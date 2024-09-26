@@ -18,6 +18,8 @@ export const translations = {
     viewInChat: "View in Chat",
     contactAuthor: "Contact Author",
     price: 'Price',
+    delete: 'Delete',
+    deleteConfirmation: 'Are you sure you want to delete this item?',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -36,6 +38,8 @@ export const translations = {
     viewInChat: "Посмотреть в чате",
     contactAuthor: "Связаться с автором",
     price: 'Цена',
+    delete: 'Удалить',
+    deleteConfirmation: 'Вы уверены, что хотите удалить этот элемент?',
   },
 };
 
