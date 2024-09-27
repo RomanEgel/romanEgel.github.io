@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-import { MessageCircle, UserCircle, Trash2, Pencil, Save, X } from 'lucide-react';
+import { MessageCircle, UserCircle, Trash2, Pencil } from 'lucide-react';
 import { ListItem } from './types';
 import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 import { 
