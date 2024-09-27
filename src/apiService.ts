@@ -148,12 +148,12 @@ export async function updateNews(news: LocalsNews, authorization: string): Promi
 
 interface SetupData {
   language: string;
-  location: string;
+  location: {lat: number, lng: number};
   description: string;
 }
 
 export const saveSetupData = async (setupData: SetupData, authorization: string) => {
-  const response = await fetch(`${API_BASE_URL}/api/setup`, {
+  const response = await fetch(`${API_BASE_URL}/api/community/_setup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

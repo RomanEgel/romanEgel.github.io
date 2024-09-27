@@ -14,6 +14,7 @@
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.1.1",
     "@mui/x-date-pickers": "^7.18.0",
+    "@react-google-maps/api": "^2.19.3",
     "@twa-dev/sdk": "^7.10.0",
     "@vitejs/plugin-basic-ssl": "^1.0.1",
     "date-fns": "^4.1.0",

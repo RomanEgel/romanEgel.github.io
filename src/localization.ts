@@ -34,6 +34,7 @@ export const translations = {
     communitySetup: 'Community Setup',
     selectLanguage: 'Select Language',
     enterLocation: 'Enter Location',
+    pickLocation: 'Pick Location',
     enterDescription: 'Enter Description',
     english: 'English',
     russian: 'Russian',
@@ -41,6 +42,9 @@ export const translations = {
     back: 'Back',
     next: 'Next',
     finish: 'Finish',
+    confirm: 'Confirm',
+    selectedLocation: "Selected location",
+    clickMapToSelectLocation: "Click on the map to select a location",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -75,6 +79,7 @@ export const translations = {
     communitySetup: 'Настройка сообщества',
     selectLanguage: 'Выберите язык',
     enterLocation: 'Введите местоположение',
+    pickLocation: 'Выбрать местоположение',
     enterDescription: 'Введите описание',
     english: 'Английский',
     russian: 'Русский',
@@ -82,6 +87,9 @@ export const translations = {
     back: 'Назад',
     next: 'Далее',
     finish: 'Завершить',
+    confirm: 'Подтвердить',
+    selectedLocation: "Выбранное местоположение",
+    clickMapToSelectLocation: "Нажмите на карту, чтобы выбрать местоположение",
   },
 };
 

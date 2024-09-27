@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { saveSetupData } from './apiService';
 import { useAuth } from './AuthContext';
 import { createTranslationFunction } from './utils';
+import LocationPicker from './LocationPicker';
 import { 
   Typography, 
   Select, 
@@ -13,8 +14,10 @@ import {
   StepLabel,
   Box,
   styled,
+  Modal,
 } from '@mui/material';
 import { LocalsCommunity } from './types';
+import GoogleMapsProvider from './GoogleMapsProvider';
 
 interface SetupAppProps {
   onSetupComplete: () => void;
@@ -24,17 +27,18 @@ interface SetupAppProps {
 const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [language, setLanguage] = useState<'en' | 'ru'>(community.language as 'en' | 'ru');
-  const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const { authorization } = useAuth();
   const t = createTranslationFunction(language);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const StyledTypography = styled(Typography)({
     color: 'var(--text-color)',
   });
 
   const StyledSelect = styled(Select)({
-    backgroundColor: 'var(--secondary-bg-color)',
+    backgroundColor: 'var(--bg-color)',
     color: 'var(--text-color)',
     '& .MuiOutlinedInput-notchedOutline': {
       borderColor: 'var(--hint-color)',
@@ -43,7 +47,7 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
 
   const StyledTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
-      backgroundColor: 'var(--secondary-bg-color)',
+      backgroundColor: 'var(--bg-color)',
       color: 'var(--text-color)',
       '& fieldset': {
         borderColor: 'var(--hint-color)',
@@ -95,11 +99,27 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     { value: 'ru', label: '🇷🇺 Русский' }
   ];
 
+  const StyledStepper = styled(Stepper)({
+    '& .MuiStepLabel-root .MuiStepLabel-label': {
+      color: 'var(--hint-color)', // Default color for labels
+    },
+    '& .MuiStepLabel-root .Mui-active': {
+      color: 'var(--button-color)', // Color for the active step
+    },
+    '& .MuiStepLabel-root .Mui-completed': {
+      color: 'var(--button-color)', // Color for completed steps
+    },
+  });
+
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
       try {
-        await saveSetupData({ language, location, description }, authorization);
-        onSetupComplete();
+        if (selectedLocation) {
+          await saveSetupData({ language, location: selectedLocation, description }, authorization);
+          onSetupComplete();
+        } else {
+          console.error('Location is not selected');
+        }
       } catch (error) {
         console.error('Error saving setup data:', error);
       }
@@ -112,7 +132,14 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
+  const handleLocationSelect = (lat: number, lng: number) => {
+    setSelectedLocation({ lat, lng });
+    setShowLocationPicker(false);
+  };
+
   const steps = [t('selectLanguage'), t('enterLocation'), t('enterDescription')];
+
+  console.log("Rendering SetupApp, showLocationPicker:", showLocationPicker);
 
   return (
     <div className="app-body">
@@ -122,13 +149,13 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
           <StyledTypography variant="h4" gutterBottom align="center">
             {t('communitySetup')}
           </StyledTypography>
-          <Stepper activeStep={activeStep}>
+          <StyledStepper activeStep={activeStep}>
             {steps.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
               </Step>
             ))}
-          </Stepper>
+          </StyledStepper>
           <Box sx={{ mt: 2 }}>
             {activeStep === 0 && (
               <StyledSelect
@@ -145,12 +172,49 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
               </StyledSelect>
             )}
             {activeStep === 1 && (
-              <StyledTextField
-                fullWidth
-                label={t('location')}
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
+              <>
+                <StyledTextField
+                  fullWidth
+                  label={t('location')}
+                  value={selectedLocation ? `${selectedLocation?.lat}, ${selectedLocation?.lng}` : ''}
+                  slotProps={{
+                    input: {
+                      readOnly: true,
+                    }
+                  }}
+                />
+                <Button 
+                  onClick={() => setShowLocationPicker(true)}
+                  fullWidth
+                  variant="outlined"
+                  sx={{ mt: 1 }}
+                >
+                  {t('pickLocation')}
+                </Button>
+                <Modal
+                  open={showLocationPicker}
+                  onClose={() => setShowLocationPicker(false)}
+                  aria-labelledby="location-picker-modal"
+                  aria-describedby="location-picker-description"
+                >
+                  <Box sx={{ 
+                    position: 'absolute', 
+                    top: '50%', 
+                    left: '50%', 
+                    transform: 'translate(-50%, -50%)',
+                    width: '90%',
+                    maxWidth: 400,
+                  }}>
+                      <GoogleMapsProvider language={language}>
+                        <LocationPicker
+                          onLocationSelect={handleLocationSelect}
+                          onClose={() => setShowLocationPicker(false)}
+                          language={language}
+                        />
+                      </GoogleMapsProvider>
+                  </Box>
+                </Modal>
+              </>
             )}
             {activeStep === 2 && (
               <StyledTextField
