@@ -105,7 +105,8 @@ export async function updateItem(item: LocalsItem, authorization: string): Promi
   await fetch(`${API_BASE_URL}/api/items/${item.id}`, {
     method: 'PUT',
     headers: {
-      Authorization: `tma ${authorization}`
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(item)
   });
@@ -116,7 +117,8 @@ export async function updateService(service: LocalsService, authorization: strin
   await fetch(`${API_BASE_URL}/api/services/${service.id}`, {
     method: 'PUT',
     headers: {
-      Authorization: `tma ${authorization}`
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(service)
   });
@@ -126,7 +128,8 @@ export async function updateEvent(event: LocalsEvent, authorization: string): Pr
   await fetch(`${API_BASE_URL}/api/events/${event.id}`, {
     method: 'PUT',
     headers: {
-      Authorization: `tma ${authorization}`
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(event)
   });
@@ -136,7 +139,8 @@ export async function updateNews(news: LocalsNews, authorization: string): Promi
   await fetch(`${API_BASE_URL}/api/news/${news.id}`, {
     method: 'PUT',
     headers: {
-      Authorization: `tma ${authorization}`
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(news)
   });
