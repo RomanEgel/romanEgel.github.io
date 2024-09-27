@@ -301,6 +301,9 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
                   label={t('date')}
                   value={dayjs(editedItem.date)}
                   onChange={handleDateTimeChange}
+                  sx={{
+                    backgroundColor: getCSSVariableValue("--bg-color"),
+                  }}
                   slotProps={{ 
                     textField: { 
                       fullWidth: true, 
