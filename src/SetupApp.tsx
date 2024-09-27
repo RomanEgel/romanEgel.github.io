@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 import { LocalsCommunity } from './types';
 import GoogleMapsProvider from './GoogleMapsProvider';
+import { StepConnector, stepConnectorClasses } from '@mui/material';
 
 interface SetupAppProps {
   onSetupComplete: () => void;
@@ -99,15 +100,43 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     { value: 'ru', label: '🇷🇺 Русский' }
   ];
 
+  const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
+    [`&.${stepConnectorClasses.alternativeLabel}`]: {
+      top: 10,
+      left: 'calc(-50% + 16px)',
+      right: 'calc(50% + 16px)',
+    },
+    [`&.${stepConnectorClasses.active}`]: {
+      [`& .${stepConnectorClasses.line}`]: {
+        borderColor: 'var(--button-color)',
+        borderStyle: 'solid', // Change to solid for completed steps
+      },
+    },
+    [`&.${stepConnectorClasses.completed}`]: {
+      [`& .${stepConnectorClasses.line}`]: {
+        borderColor: 'var(--button-color)',
+        borderStyle: 'solid', // Change to solid for completed steps
+      },
+    },
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: 'var(--hint-color)',
+      borderTopWidth: 3,
+      borderRadius: 1,
+      borderStyle: 'dotted', // Keep dotted for upcoming steps
+    },
+  }));
+
   const StyledStepper = styled(Stepper)({
     '& .MuiStepLabel-root .MuiStepLabel-label': {
-      color: 'var(--hint-color)', // Default color for labels
+      color: 'var(--hint-color)',
+      display: 'none', // Hide all labels by default
     },
     '& .MuiStepLabel-root .Mui-active': {
-      color: 'var(--button-color)', // Color for the active step
+      color: 'var(--button-color)',
+      display: 'block', // Show label for active step
     },
     '& .MuiStepLabel-root .Mui-completed': {
-      color: 'var(--button-color)', // Color for completed steps
+      color: 'var(--button-color)',
     },
   });
 
@@ -149,10 +178,10 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
           <StyledTypography variant="h4" gutterBottom align="center">
             {t('communitySetup')}
           </StyledTypography>
-          <StyledStepper activeStep={activeStep}>
-            {steps.map((label) => (
+          <StyledStepper activeStep={activeStep} connector={<StyledStepConnector />}>
+            {steps.map((label, index) => (
               <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel>{activeStep === index ? label : ''}</StepLabel>
               </Step>
             ))}
           </StyledStepper>
