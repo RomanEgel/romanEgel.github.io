@@ -14,10 +14,6 @@ const mapContainerStyle = {
   height: '300px'
 };
 
-const center = {
-  lat: 0,
-  lng: 0
-};
 
 const StyledBox = styled(Box)({
   backgroundColor: 'var(--bg-color)',
