@@ -100,7 +100,7 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     { value: 'ru', label: '🇷🇺 Русский' }
   ];
 
-  const StyledStepConnector = styled(StepConnector)(({ theme }) => ({
+  const StyledStepConnector = styled(StepConnector)(({  }) => ({
     [`&.${stepConnectorClasses.alternativeLabel}`]: {
       top: 10,
       left: 'calc(-50% + 16px)',
