@@ -20,6 +20,115 @@ import { LocalsCommunity } from './types';
 import GoogleMapsProvider from './GoogleMapsProvider';
 import { StepConnector, stepConnectorClasses } from '@mui/material';
 
+
+const StyledTypography = styled(Typography)({
+  color: 'var(--text-color)',
+});
+
+const StyledSelect = styled(Select)({
+  backgroundColor: 'var(--bg-color)',
+  color: 'var(--text-color)',
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: 'var(--hint-color)',
+  },
+});
+
+const StyledTextField = styled(TextField)({
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: 'var(--bg-color)',
+    color: 'var(--text-color)',
+    '& fieldset': {
+      borderColor: 'var(--hint-color)',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'var(--hint-color)',
+  },
+});
+
+const StyledButton = styled(Button)({
+  backgroundColor: 'var(--button-color)',
+  color: 'var(--button-text-color)',
+  '&:hover': {
+    backgroundColor: 'var(--button-color)',
+    opacity: 0.8,
+  },
+});
+
+const StyledContainer = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  minHeight: '100vh',
+  padding: '16px',
+  paddingTop: '0',
+}));
+
+const StyledContent = styled(Box)(() => ({
+  maxWidth: '400px',
+  width: '100%',
+  margin: '0 auto',
+  marginTop: '-20vh',
+}));
+
+const StyledIcon = styled('img')(() => ({
+  width: '120px',
+  height: '120px',
+  borderRadius: '50%',
+  padding: '16px',
+  margin: '0 auto 24px auto',
+  display: 'block',
+  backgroundColor: 'var(--secondary-bg-color)',
+  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+}));
+
+const languageOptions = [
+  { value: 'en', label: '🇬🇧 English' },
+  { value: 'ru', label: '🇷🇺 Русский' }
+];
+
+const StyledStepConnector = styled(StepConnector)(() => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 10,
+    left: 'calc(-50% + 16px)',
+    right: 'calc(50% + 16px)',
+  },
+  [`&.${stepConnectorClasses.active}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: 'var(--button-color)',
+      borderStyle: 'solid',
+    },
+  },
+  [`&.${stepConnectorClasses.completed}`]: {
+    [`& .${stepConnectorClasses.line}`]: {
+      borderColor: 'var(--button-color)',
+      borderStyle: 'solid',
+    },
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    borderColor: 'var(--hint-color)',
+    borderTopWidth: 3,
+    borderRadius: 1,
+    borderStyle: 'dotted',
+  },
+}));
+
+const StyledStepper = styled(Stepper)(() => ({
+  '& .MuiStepLabel-root .MuiStepLabel-label': {
+    display: 'none', // Hide all labels by default
+  },
+  '& .MuiStepLabel-root .Mui-active .MuiStepLabel-label': {
+    color: 'var(--button-color)',
+    display: 'block', // Show only the active step label
+  },
+  '& .MuiStepIcon-root': {
+    color: 'var(--hint-color)', // Inactive steps
+  },
+  '& .MuiStepIcon-root.Mui-active, & .MuiStepIcon-root.Mui-completed': {
+    color: 'var(--button-color)', // Active and completed steps
+  },
+}));
+
 interface SetupAppProps {
   onSetupComplete: () => void;
   community: LocalsCommunity;
@@ -33,112 +142,6 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
   const t = createTranslationFunction(language);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
-
-  const StyledTypography = styled(Typography)({
-    color: 'var(--text-color)',
-  });
-
-  const StyledSelect = styled(Select)({
-    backgroundColor: 'var(--bg-color)',
-    color: 'var(--text-color)',
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderColor: 'var(--hint-color)',
-    },
-  });
-
-  const StyledTextField = styled(TextField)({
-    '& .MuiOutlinedInput-root': {
-      backgroundColor: 'var(--bg-color)',
-      color: 'var(--text-color)',
-      '& fieldset': {
-        borderColor: 'var(--hint-color)',
-      },
-    },
-    '& .MuiInputLabel-root': {
-      color: 'var(--hint-color)',
-    },
-  });
-
-  const StyledButton = styled(Button)({
-    backgroundColor: 'var(--button-color)',
-    color: 'var(--button-text-color)',
-    '&:hover': {
-      backgroundColor: 'var(--button-color)',
-      opacity: 0.8,
-    },
-  });
-
-  const StyledContainer = styled(Box)({
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    minHeight: '100vh',
-    padding: '16px',
-    paddingTop: '0', // Remove top padding
-  });
-
-  const StyledContent = styled(Box)({
-    maxWidth: '400px',
-    width: '100%',
-    margin: '0 auto',
-    marginTop: '-20vh', // Move content up by 10% of the viewport height
-  });
-
-  const StyledIcon = styled('img')({
-    width: '120px',  // Increased from 56px
-    height: '120px', // Increased from 56px
-    borderRadius: '50%',
-    padding: '16px', // Increased from 8px
-    margin: '0 auto 24px auto', // Increased bottom margin
-    display: 'block',
-    backgroundColor: 'var(--secondary-bg-color)', // Added for better visibility
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Added for depth
-  });
-
-  const languageOptions = [
-    { value: 'en', label: '🇬🇧 English' },
-    { value: 'ru', label: '🇷🇺 Русский' }
-  ];
-
-  const StyledStepConnector = styled(StepConnector)(({  }) => ({
-    [`&.${stepConnectorClasses.alternativeLabel}`]: {
-      top: 10,
-      left: 'calc(-50% + 16px)',
-      right: 'calc(50% + 16px)',
-    },
-    [`&.${stepConnectorClasses.active}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-        borderColor: 'var(--button-color)',
-        borderStyle: 'solid', // Change to solid for completed steps
-      },
-    },
-    [`&.${stepConnectorClasses.completed}`]: {
-      [`& .${stepConnectorClasses.line}`]: {
-        borderColor: 'var(--button-color)',
-        borderStyle: 'solid', // Change to solid for completed steps
-      },
-    },
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: 'var(--hint-color)',
-      borderTopWidth: 3,
-      borderRadius: 1,
-      borderStyle: 'dotted', // Keep dotted for upcoming steps
-    },
-  }));
-
-  const StyledStepper = styled(Stepper)({
-    '& .MuiStepLabel-root .MuiStepLabel-label': {
-      color: 'var(--hint-color)',
-      display: 'none', // Hide all labels by default
-    },
-    '& .MuiStepLabel-root .Mui-active': {
-      color: 'var(--button-color)',
-      display: 'block', // Show label for active step
-    },
-    '& .MuiStepLabel-root .Mui-completed': {
-      color: 'var(--button-color)',
-    },
-  });
 
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
