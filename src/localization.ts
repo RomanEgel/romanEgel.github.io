@@ -28,6 +28,9 @@ export const translations = {
     cancel: 'Cancel',
     save: 'Save',
     edit: 'Edit',
+    title: 'Title',
+    date: 'Date',
+    description: 'Description',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -56,6 +59,9 @@ export const translations = {
     cancel: 'Отменить',
     save: 'Сохранить',
     edit: 'Редактировать',
+    title: 'Название',
+    date: 'Дата',
+    description: 'Описание',
   },
 };
 
