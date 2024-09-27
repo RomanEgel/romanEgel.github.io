@@ -7,77 +7,10 @@ import { translations } from './localization';
 import StorageManager from './StorageManager';
 import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
+import { LocalsCommunity, LocalsUser, LocalsItem, LocalsService, LocalsEvent, LocalsNews, ListItem } from './types';
 
-interface LocalsItem {
-  id: string
-  title: string
-  price: number
-  currency: string
-  image: string
-  author: string
-  username: string
-  publishedAt: string
-  category: string
-  description: string
-  communityId: number
-  messageId: number
-}
-
-interface LocalsService {
-  id: string
-  title: string
-  price: number
-  currency: string
-  image: string
-  author: string
-  username: string
-  publishedAt: string
-  category: string
-  description: string
-  communityId: number
-  messageId: number
-}
-
-interface LocalsEvent {
-  id: string
-  title: string
-  date: string
-  image: string
-  author: string
-  username: string
-  publishedAt: string
-  category: string
-  description: string
-  communityId: number
-  messageId: number
-}
-
-interface LocalsNews {
-  id: string
-  title: string
-  image: string
-  author: string
-  username: string
-  publishedAt: string
-  category: string
-  description: string
-  communityId: number
-  messageId: number
-}
 
 type TabType = 'events' | 'items' | 'services' | 'news'
-type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
-
-interface LocalsCommunity {
-  id: number;
-  name: string;
-  language: 'en' | 'ru';  // Add this line
-}
-interface LocalsUser {
-  first_name: string;
-  last_name: string;
-  username: string;
-}
 
 interface AppProps {
   community: LocalsCommunity;

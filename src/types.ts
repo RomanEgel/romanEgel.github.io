@@ -28,3 +28,33 @@ export interface LocalsEvent extends BaseItem {
 }
 
 export interface LocalsNews extends BaseItem {}
+
+
+export interface LocalsItem {
+  id: string
+  title: string
+  price: number
+  currency: string
+  image: string
+  author: string
+  username: string
+  publishedAt: string
+  category: string
+  description: string
+  communityId: number
+  messageId: number
+}
+
+export interface LocalsCommunity {
+  id: string;
+  chatId: string;
+  name: string;
+  status: 'SETUP' | 'READY';
+  language: 'en' | 'ru';
+}
+
+export interface LocalsUser {
+  first_name: string;
+  last_name: string;
+  username: string;
+}

@@ -145,3 +145,23 @@ export async function updateNews(news: LocalsNews, authorization: string): Promi
     body: JSON.stringify(news)
   });
 }
+
+interface SetupData {
+  language: string;
+  location: string;
+  description: string;
+}
+
+export const saveSetupData = async (setupData: SetupData, authorization: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/setup`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `tma ${authorization}`
+    },
+    body: JSON.stringify(setupData)
+  });
+  if (!response.ok) {
+    throw new Error('Failed to save setup data');
+  }
+};
