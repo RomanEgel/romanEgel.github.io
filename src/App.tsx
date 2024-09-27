@@ -1,7 +1,7 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Settings } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews } from './apiService'
+import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
 import StorageManager from './StorageManager';
@@ -383,6 +383,33 @@ function App({ community, user }: AppProps) {
     }
   }, [reloadData]);
 
+  const handleEditItem = async (item: ListItem, active_tab: string) => {
+    try {
+      switch (active_tab) {
+        case 'items':
+          await updateItem(item as LocalsItem, authorization);
+          break;
+        case 'services':
+          await updateService(item as LocalsService, authorization);
+          break;
+        case 'events':
+          await updateEvent(item as LocalsEvent, authorization);
+          break;
+        case 'news':
+          await updateNews(item as LocalsNews, authorization);
+          break;
+      }
+      
+      // Set the reload flag to true
+      setReloadData(true);
+      
+      setSelectedItem(null);
+    } catch (error) {
+      console.error('Error updating item:', error);
+      setSelectedItem(null);
+    }
+  };
+
   const handleDeleteItem = async (item_id: string, active_tab: string) => {
     try {
       switch (active_tab) {
@@ -406,7 +433,7 @@ function App({ community, user }: AppProps) {
       setSelectedItem(null);
     } catch (error) {
       console.error('Error deleting item:', error);
-      // Optionally, you can add error handling here, such as showing an error message to the user
+      setSelectedItem(null);
     }
   };
 
@@ -420,6 +447,7 @@ function App({ community, user }: AppProps) {
           communityLanguage={community.language}
           isCurrentUserAuthor={selectedItem.username === user.username}
           onDelete={handleDeleteItem}
+          onEdit={handleEditItem}
         />
       ) : (
         <div ref={appContainerRef} className="flex-grow flex flex-col app-container">

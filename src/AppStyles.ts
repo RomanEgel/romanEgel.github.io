@@ -131,6 +131,13 @@ const componentStyles = css`
       opacity: 0.8;
     }
   }
+    .app-button-edit {
+    transition: opacity 0.3s ease;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
   .app-input {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -174,7 +181,39 @@ const componentStyles = css`
   .app-image-container {
     background-color: var(--secondary-bg-color);
   }
+
+  .app-button-save {
+    background-color: var(--button-color);
+    color: var(--button-text-color);
+    opacity: 0.9;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .app-button-cancel {
+    background-color: var(--hint-color);
+    color: var(--button-text-color);
+    opacity: 0.9;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .app-input {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--hint-color);
+    border-radius: 4px;
+    padding: 8px;
+    width: 100%;
+    &:focus {
+      outline: none;
+      border-color: var(--button-color);
+    }
+  }
 `
+
 const responsiveStyles = css`
   @media (min-width: 768px) {
     .app-body {
@@ -220,6 +259,19 @@ const responsiveStyles = css`
       margin-top: 110px;
       margin-bottom: 60px;
       height: calc(100% - 160px);
+      padding-top: 0;
+      overflow-y: auto;
+    }
+
+    .app-bottom-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
+
+    .app-card-detail-content {
+      margin-bottom: 60px;
+      height: calc(100% - 60px);
       padding-top: 0;
       overflow-y: auto;
     }

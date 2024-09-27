@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config';
+import { LocalsEvent, LocalsNews, LocalsItem, LocalsService } from './types';
 
 export const validateAuthorization = async (authorization: string) => {
   const response = await fetch(`${API_BASE_URL}/api/init`, {
@@ -98,4 +99,45 @@ export async function deleteNews(newsId: string, authorization: string): Promise
     }
   });
   
+}
+
+export async function updateItem(item: LocalsItem, authorization: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/api/items/${item.id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `tma ${authorization}`
+    },
+    body: JSON.stringify(item)
+  });
+  
+}
+
+export async function updateService(service: LocalsService, authorization: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/api/services/${service.id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `tma ${authorization}`
+    },
+    body: JSON.stringify(service)
+  });
+}
+
+export async function updateEvent(event: LocalsEvent, authorization: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/api/events/${event.id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `tma ${authorization}`
+    },
+    body: JSON.stringify(event)
+  });
+}
+
+export async function updateNews(news: LocalsNews, authorization: string): Promise<void> {
+  await fetch(`${API_BASE_URL}/api/news/${news.id}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `tma ${authorization}`
+    },
+    body: JSON.stringify(news)
+  });
 }
