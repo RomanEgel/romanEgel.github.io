@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-import { MessageCircle, UserCircle, Trash2, Pencil, Save, X } from 'lucide-react';
+import { MessageCircle, UserCircle, Trash2, Pencil, Save, X, ArrowLeft } from 'lucide-react';
 import { ListItem } from './types';
 import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 import { 
@@ -167,6 +167,19 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
   return (
     <CustomThemeProvider>
       <div className="flex-grow flex flex-col app-container">
+        <div className="app-header flex justify-end items-center p-2">
+          {isCurrentUserAuthor && !isEditing && (
+            <div>
+              <button onClick={handleEdit} className="p-2 bg-white bg-opacity-70 rounded-full app-button-edit mr-2">
+                <Pencil className="h-5 w-5" />
+              </button>
+              <button onClick={handleDelete} className="p-2 bg-white bg-opacity-70 rounded-full app-button-delete">
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="flex-grow overflow-y-auto app-card-detail-content">
           <div className="w-full h-64 md:h-80 lg:h-96 relative app-image-container">
             <img 
@@ -174,22 +187,6 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
               alt={item.title} 
               className="w-full h-full object-contain"
             />
-            {isCurrentUserAuthor && !isEditing && (
-              <div className="absolute top-2 right-2 flex">
-                <button
-                  onClick={handleEdit}
-                  className="p-2 bg-white bg-opacity-70 rounded-full app-button-edit mr-2"
-                >
-                  <Pencil className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="p-2 bg-white bg-opacity-70 rounded-full app-button-delete"
-                >
-                  <Trash2 className="h-5 w-5" />
-                </button>
-              </div>
-            )}
           </div>
           
           <div className="p-4" style={{ color: theme.palette.text.primary }}>

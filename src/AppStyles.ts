@@ -74,7 +74,7 @@ const layoutStyles = css`
     z-index: 20;
     background-color: var(--header-bg-color);
     color: var(--header-text-color);
-    padding: 0.5rem;
+    padding: 0.5rem 1rem;
     height: 40px;
   }
   .app-filter-row {
@@ -131,7 +131,7 @@ const componentStyles = css`
       opacity: 0.8;
     }
   }
-    .app-button-edit {
+  .app-button-edit {
     transition: opacity 0.3s ease;
     &:hover {
       opacity: 0.8;
