@@ -16,13 +16,15 @@ import {
   FormControl 
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import 'dayjs/locale/ru'; // Import Russian locale
+import 'dayjs/locale/en'; // Import English locale
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { theme } from './theme';
 import { styled } from '@mui/system';
-import { CustomThemeProvider } from './CustomThemeProvider';
+import { CustomThemeProvider, getCSSVariableValue } from './CustomThemeProvider';
 
 interface CardDetailViewProps {
   item: ListItem;
@@ -41,8 +43,8 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
 }));
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
-  color: theme.palette.primary.contrastText,
+  backgroundColor: theme.palette.secondary.main,
+  color: theme.palette.secondary.contrastText,
 }));
 
 const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
@@ -55,14 +57,15 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: theme.spacing(1, 3),
-  color: theme.palette.primary.contrastText,
-  backgroundColor: theme.palette.primary.main,
+  color: getCSSVariableValue('--button-text-color'),
+  backgroundColor: getCSSVariableValue('--button-color'),
   '&:hover': {
     backgroundColor: theme.palette.primary.dark,
   },
 }));
 
 const StyledTextField = styled(MuiTextField)(({ theme }) => ({
+  backgroundColor: getCSSVariableValue("--bg-color"),
   '& .MuiInputBase-root': {
     color: theme.palette.text.primary,
   },
@@ -148,19 +151,24 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
     const { name, value } = e.target;
-    setEditedItem(prev => ({ ...prev, [name]: value }));
+    setEditedItem(prev => {
+      if (name === 'price') {
+        return { ...prev, [name]: parseFloat(value) || 0 };
+      }
+      return { ...prev, [name]: value };
+    });
   };
 
-  const handleDateChange = (date: dayjs.Dayjs | null) => {
-    if (date) {
-      setEditedItem(prev => ({ ...prev, date: date.toISOString() }));
+  const handleDateTimeChange = (dateTime: dayjs.Dayjs | null) => {
+    if (dateTime) {
+      setEditedItem(prev => ({ ...prev, date: dateTime.toISOString() }));
     }
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (value === '' || /^\d+(\.\d{0,2})?$/.test(value)) {
-      setEditedItem(prev => ({ ...prev, price: value }));
+      setEditedItem(prev => ({ ...prev, price: parseFloat(value) || 0 }));
     }
   };
 
@@ -200,7 +208,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
                 )}
                 {'date' in item && (
                   <p className="font-bold app-event-date text-lg mb-2">
-                    {formatDate(item.date, true, communityLanguage)}
+                    {formatDate(item.date, true, communityLanguage)} {/* Add a parameter to include time */}
                   </p>
                 )}
                 <div className="flex justify-between items-center mb-4 text-sm">
@@ -219,19 +227,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
 
         <nav className="app-bottom-bar" style={{ backgroundColor: theme.palette.background.paper }}>
           <div className="flex justify-around">
-            {isEditing ? (
-              <>
-                <StyledButton onClick={handleCancel} className="app-button-cancel">
-                  <X className="h-5 w-5 inline-block mr-2" />
-                  <span>{t('cancel')}</span>
-                </StyledButton>
-                <div className="w-0.5"/>
-                <StyledButton onClick={handleSave}>
-                  <Save className="h-5 w-5 inline-block mr-2" />
-                  <span>{t('save')}</span>
-                </StyledButton>
-              </>
-            ) : (
+            {!isEditing && (
               <>
                 <button
                   onClick={() => openTelegramLink(messageLink)}
@@ -285,6 +281,9 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
                     value={editedItem.currency}
                     onChange={handleInputChange}
                     label={t('currency')}
+                    sx={{
+                      backgroundColor: getCSSVariableValue("--bg-color"),
+                    }}
                   >
                     <MenuItem value="USD">USD</MenuItem>
                     <MenuItem value="EUR">EUR</MenuItem>
@@ -294,11 +293,14 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
               </div>
             )}
             {'date' in editedItem && (
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
+              <LocalizationProvider 
+                dateAdapter={AdapterDayjs} 
+                adapterLocale={communityLanguage === 'ru' ? 'ru' : 'en'}
+              >
+                <DateTimePicker
                   label={t('date')}
                   value={dayjs(editedItem.date)}
-                  onChange={handleDateChange}
+                  onChange={handleDateTimeChange}
                   slotProps={{ 
                     textField: { 
                       fullWidth: true, 
@@ -320,7 +322,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
             />
           </StyledDialogContent>
           <StyledDialogActions>
-            <StyledButton onClick={handleCancel} className="app-button-cancel">{t('cancel')}</StyledButton>
+            <StyledButton onClick={handleCancel}>{t('cancel')}</StyledButton>
             <StyledButton onClick={handleSave}>{t('save')}</StyledButton>
           </StyledDialogActions>
         </StyledDialog>

@@ -1,19 +1,15 @@
 import { getTranslation, translations } from './localization';
 import WebApp from '@twa-dev/sdk';
+import dayjs from 'dayjs';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/en';
 
-export const formatDate = (dateString: string, isEventDate: boolean = false, language: 'en' | 'ru') => {
-  const options: Intl.DateTimeFormatOptions = { 
-    weekday: 'short', 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    ...(isEventDate ? { timeZone: 'UTC' } : {})
-  };
+export const formatDate = (date: string, includeTime: boolean, language: 'en' | 'ru', includeSeconds: boolean = false) => {
+  const format = includeTime
+    ? (includeSeconds ? 'DD MMMM YYYY, HH:mm:ss' : 'DD MMMM YYYY, HH:mm')
+    : 'DD MMMM YYYY';
   
-  const locale = language === 'ru' ? 'ru-RU' : 'en-US';
-  return new Intl.DateTimeFormat(locale, options).format(new Date(dateString));
+  return dayjs(date).locale(language).format(format);
 };
 
 export const formatPrice = (price: number | null | undefined, currency: string | null | undefined, language: 'en' | 'ru') => {

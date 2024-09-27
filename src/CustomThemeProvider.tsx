@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { getThemeOptions } from './theme';
 
-const getCSSVariableValue = (variable: string) => {
+export const getCSSVariableValue = (variable: string) => {
   return getComputedStyle(document.documentElement).getPropertyValue(variable).trim();
 };
 
@@ -16,8 +16,12 @@ export const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({ c
       primary: {
         main: getCSSVariableValue('--button-color'),
       },
+      secondary: {
+        main: getCSSVariableValue('--header-bg-color'),
+        contrastText: getCSSVariableValue('--header-text-color'),
+      },
       background: {
-        default: getCSSVariableValue('--bg-color'),
+        default: getCSSVariableValue('--secondary-bg-color'),
         paper: getCSSVariableValue('--section-bg-color'),
       },
       text: {
