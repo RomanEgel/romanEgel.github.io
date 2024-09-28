@@ -207,23 +207,27 @@ function App({ community, user }: AppProps) {
       const entitySettings = community.entitySettings;
       let hashtag: string;
       let localizedEntityType: string;
-
+      let noRecordsFoundLocalized: string;
       switch (activeTab) {
         case 'events':
           hashtag = entitySettings.eventHashtag;
           localizedEntityType = t('event');
+          noRecordsFoundLocalized = t('noEventsFound');
           break;
         case 'items':
           hashtag = entitySettings.itemHashtag;
           localizedEntityType = t('item');
+          noRecordsFoundLocalized = t('noItemsFound');
           break;
         case 'services':
           hashtag = entitySettings.serviceHashtag;
           localizedEntityType = t('service');
+          noRecordsFoundLocalized = t('noServicesFound');
           break;
         case 'news':
           hashtag = entitySettings.newsHashtag;
           localizedEntityType = t('news');
+          noRecordsFoundLocalized = t('noNewsFound');
           break;
         default:
           throw new Error('Invalid tab');
@@ -231,7 +235,7 @@ function App({ community, user }: AppProps) {
 
       return (
         <div className="flex flex-col items-center justify-center h-full p-4">
-          <p className="text-center app-hint mb-4">{t('noRecordsFound')}</p>
+          <p className="text-center app-hint mb-4">{noRecordsFoundLocalized}</p>
           <div className="app-card rounded-lg p-4 max-w-sm">
             <p className="text-center app-hint text-sm mb-2">
               {t('createNewEntityInstructionPart1').replace('{{entityType}}', localizedEntityType)}
@@ -427,11 +431,11 @@ function App({ community, user }: AppProps) {
                 <MapPin className="h-4 w-4 mr-1" />
                 <span className="text-sm">{community.name}</span>
               </div>
-              <div className="flex items-center">
+              {/* <div className="flex items-center">
                 <button className="p-1 rounded-full app-button">
                   <Settings className="h-5 w-5" />
                 </button>
-              </div>
+              </div> */}
             </div>
           </header>
 
