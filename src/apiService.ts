@@ -149,7 +149,12 @@ export async function updateNews(news: LocalsNews, authorization: string): Promi
 interface SetupData {
   language: string;
   location: {lat: number, lng: number};
-  description: string;
+  entitySettings: {
+    eventHashtag: string;
+    itemHashtag: string;
+    serviceHashtag: string;
+    newsHashtag: string;
+  };
 }
 
 export const saveSetupData = async (setupData: SetupData, authorization: string) => {

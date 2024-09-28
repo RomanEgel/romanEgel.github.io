@@ -46,6 +46,11 @@ export const translations = {
     selectedLocation: "Selected location",
     clickMapToSelectLocation: "Click on the map to select a location",
     ongoingSetup: "is being setup. Please check later.",
+    entityExtractionSettings: 'Entity Extraction Settings',
+    eventHashtag: 'Event Hashtag',
+    itemHashtag: 'Item Hashtag',
+    serviceHashtag: 'Service Hashtag',
+    newsHashtag: 'News Hashtag',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -92,6 +97,11 @@ export const translations = {
     selectedLocation: "Выбранное местоположение",
     clickMapToSelectLocation: "Нажмите на карту, чтобы выбрать местоположение",
     ongoingSetup: "настраивается. Пожалуйста, попробуйте зайти позже.",
+    entityExtractionSettings: 'Настройки извлечения сущностей',
+    eventHashtag: 'Хештег события',
+    itemHashtag: 'Хештег товара',
+    serviceHashtag: 'Хештег услуги',
+    newsHashtag: 'Хештег новости',
   },
 };
 

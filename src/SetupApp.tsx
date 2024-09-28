@@ -75,6 +75,12 @@ const StyledMap = styled(Box)({
   marginBottom: '16px',
 });
 
+const StyledContainer = styled('div')({
+  padding: '0 16px', // Add horizontal padding
+  width: '100%',
+  margin: '0 auto', // Center the container
+});
+
 const languageOptions = [
   { value: 'en', label: '🇬🇧 English' },
   { value: 'ru', label: '🇷🇺 Русский' }
@@ -121,6 +127,13 @@ const StyledStepper = styled(Stepper)(() => ({
   },
 }));
 
+interface EntityExtractionSettings {
+  eventHashtag: string;
+  itemHashtag: string;
+  serviceHashtag: string;
+  newsHashtag: string;
+}
+
 interface SetupAppProps {
   onSetupComplete: () => void;
   community: LocalsCommunity;
@@ -129,16 +142,21 @@ interface SetupAppProps {
 const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [language, setLanguage] = useState<'en' | 'ru'>(community.language as 'en' | 'ru');
-  const [description, setDescription] = useState('');
   const { authorization } = useAuth();
   const t = createTranslationFunction(language);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [entitySettings, setEntitySettings] = useState<EntityExtractionSettings>({
+    eventHashtag: '#events',
+    itemHashtag: '#items',
+    serviceHashtag: '#services',
+    newsHashtag: '#news',
+  });
 
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
       try {
         if (selectedLocation) {
-          await saveSetupData({ language, location: selectedLocation, description }, authorization);
+          await saveSetupData({ language, location: selectedLocation, entitySettings }, authorization);
           onSetupComplete();
         } else {
           console.error('Location is not selected');
@@ -159,15 +177,21 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     setSelectedLocation({ lat, lng });
   };
 
-  const steps = [t('selectLanguage'), t('enterLocation'), t('enterDescription')];
+  const handleEntitySettingChange = (setting: keyof EntityExtractionSettings) => (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setEntitySettings((prev) => ({ ...prev, [setting]: event.target.value }));
+  };
+
+  const steps = [t('selectLanguage'), t('enterLocation'), t('entityExtractionSettings')];
 
   const isNextDisabled = (activeStep === 1 && !selectedLocation) || 
-                         (activeStep === 2 && description.trim() === '');
+                         (activeStep === 2 && Object.values(entitySettings).some(value => value.trim() === ''));
 
   return (
     <CustomThemeProvider>
-      <div className = 'min-h-screen flex flex-col app-body'>
-        <div className = 'flex-grow flex flex-col app-container'>
+      <div className="min-h-screen flex flex-col app-body">
+        <StyledContainer className="flex-grow flex flex-col app-container">
           <StyledIcon src="/icon.png" alt="Community Icon" />
           <StyledTypography variant="h4" gutterBottom align="center">
             {t('communitySetup')}
@@ -179,49 +203,66 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
               </Step>
             ))}
           </StyledStepper>
-          <div className = 'flex flex-col'>
-          <div className = 'flex flex-col mt-2'>
-            {activeStep === 0 && (
-              <StyledSelect
-                fullWidth
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as 'en' | 'ru')}
-                displayEmpty
-              >
-                {languageOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </StyledSelect>
-            )}
-            {activeStep === 1 && (
-              <div className = 'flex flex-col'>
-                <StyledMap>
-                  <GoogleMapsProvider language={language}>
-                    <LocationPicker
-                      onLocationSelect={handleLocationSelect}
-                      language={language}
-                    />
-                  </GoogleMapsProvider>
-                </StyledMap>
-              </div>
-            )}
-            {activeStep === 2 && (
-              <StyledTextField
-                fullWidth
-                multiline
-                rows={4}
-                label={t('description')}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            )}
-          </div>
-          <div className = 'flex flex-row pt-2'>
+          <div className="flex flex-col">
+            <div className="flex flex-col mt-2">
+              {activeStep === 0 && (
+                <StyledSelect
+                  fullWidth
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as 'en' | 'ru')}
+                  displayEmpty
+                >
+                  {languageOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </StyledSelect>
+              )}
+              {activeStep === 1 && (
+                <div className="flex flex-col">
+                  <StyledMap>
+                    <GoogleMapsProvider language={language}>
+                      <LocationPicker
+                        onLocationSelect={handleLocationSelect}
+                        language={language}
+                      />
+                    </GoogleMapsProvider>
+                  </StyledMap>
+                </div>
+              )}
+              {activeStep === 2 && (
+                <div className="flex flex-col space-y-4">
+                  <StyledTextField
+                    fullWidth
+                    label={t('eventHashtag')}
+                    value={entitySettings.eventHashtag}
+                    onChange={handleEntitySettingChange('eventHashtag')}
+                  />
+                  <StyledTextField
+                    fullWidth
+                    label={t('itemHashtag')}
+                    value={entitySettings.itemHashtag}
+                    onChange={handleEntitySettingChange('itemHashtag')}
+                  />
+                  <StyledTextField
+                    fullWidth
+                    label={t('serviceHashtag')}
+                    value={entitySettings.serviceHashtag}
+                    onChange={handleEntitySettingChange('serviceHashtag')}
+                  />
+                  <StyledTextField
+                    fullWidth
+                    label={t('newsHashtag')}
+                    value={entitySettings.newsHashtag}
+                    onChange={handleEntitySettingChange('newsHashtag')}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex flex-row pt-2">
               {activeStep > 0 && (
                 <StyledButton
-                  color="inherit"
                   onClick={handleBack}
                   sx={{ mr: 1 }}
                 >
@@ -236,8 +277,8 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
                 {activeStep === steps.length - 1 ? t('finish') : t('next')}
               </StyledButton>
             </div>
-            </div>
-        </div>
+          </div>
+        </StyledContainer>
       </div>
     </CustomThemeProvider>
   );
