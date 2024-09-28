@@ -51,6 +51,11 @@ const StyledButton = styled(Button)({
     backgroundColor: 'var(--button-color)',
     opacity: 0.8,
   },
+  '&:disabled': {
+    backgroundColor: 'var(--hint-color)',
+    color: 'var(--bg-color)',
+    opacity: 0.7,
+  },
 });
 
 const StyledIcon = styled('img')(() => ({
@@ -156,6 +161,9 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
 
   const steps = [t('selectLanguage'), t('enterLocation'), t('enterDescription')];
 
+  const isNextDisabled = (activeStep === 1 && !selectedLocation) || 
+                         (activeStep === 2 && description.trim() === '');
+
   return (
     <CustomThemeProvider>
       <div className = 'min-h-screen flex flex-col app-body'>
@@ -221,7 +229,10 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
                 </StyledButton>
               )}
               <Box sx={{ flex: '1 1 auto' }} />
-              <StyledButton onClick={handleNext}>
+              <StyledButton 
+                onClick={handleNext} 
+                disabled={isNextDisabled}
+              >
                 {activeStep === steps.length - 1 ? t('finish') : t('next')}
               </StyledButton>
             </div>

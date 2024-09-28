@@ -45,6 +45,7 @@ export const translations = {
     confirm: 'Confirm',
     selectedLocation: "Selected location",
     clickMapToSelectLocation: "Click on the map to select a location",
+    ongoingSetup: "is being setup. Please check later.",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -90,6 +91,7 @@ export const translations = {
     confirm: 'Подтвердить',
     selectedLocation: "Выбранное местоположение",
     clickMapToSelectLocation: "Нажмите на карту, чтобы выбрать местоположение",
+    ongoingSetup: "настраивается. Пожалуйста, попробуйте зайти позже.",
   },
 };
 
