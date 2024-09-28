@@ -19,8 +19,7 @@ import {
 import { LocalsCommunity } from './types';
 import GoogleMapsProvider from './GoogleMapsProvider';
 import { StepConnector, stepConnectorClasses } from '@mui/material';
-
-
+import { CustomThemeProvider } from './CustomThemeProvider';
 const StyledTypography = styled(Typography)({
   color: 'var(--text-color)',
 });
@@ -55,22 +54,6 @@ const StyledButton = styled(Button)({
   },
 });
 
-const StyledContainer = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  minHeight: '100vh',
-  padding: '16px',
-  paddingTop: '0',
-}));
-
-const StyledContent = styled(Box)(() => ({
-  maxWidth: '400px',
-  width: '100%',
-  margin: '0 auto',
-  marginTop: '-20vh',
-}));
-
 const StyledIcon = styled('img')(() => ({
   width: '120px',
   height: '120px',
@@ -81,6 +64,12 @@ const StyledIcon = styled('img')(() => ({
   backgroundColor: 'var(--secondary-bg-color)',
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 }));
+
+const StyledMap = styled(Box)({
+  width: '100%',
+  marginTop: '16px',
+  marginBottom: '16px',
+});
 
 const languageOptions = [
   { value: 'en', label: '🇬🇧 English' },
@@ -115,11 +104,10 @@ const StyledStepConnector = styled(StepConnector)(() => ({
 
 const StyledStepper = styled(Stepper)(() => ({
   '& .MuiStepLabel-root .MuiStepLabel-label': {
-    display: 'none', // Hide all labels by default
+    color: 'var(--button-color)',
   },
   '& .MuiStepLabel-root .Mui-active .MuiStepLabel-label': {
     color: 'var(--button-color)',
-    display: 'block', // Show only the active step label
   },
   '& .MuiStepIcon-root': {
     color: 'var(--hint-color)', // Inactive steps
@@ -140,7 +128,6 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
   const [description, setDescription] = useState('');
   const { authorization } = useAuth();
   const t = createTranslationFunction(language);
-  const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleNext = async () => {
@@ -166,17 +153,14 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
 
   const handleLocationSelect = (lat: number, lng: number) => {
     setSelectedLocation({ lat, lng });
-    setShowLocationPicker(false);
   };
 
   const steps = [t('selectLanguage'), t('enterLocation'), t('enterDescription')];
 
-  console.log("Rendering SetupApp, showLocationPicker:", showLocationPicker);
-
   return (
-    <div className="app-body">
-      <StyledContainer>
-        <StyledContent>
+    <CustomThemeProvider>
+      <div className = 'min-h-screen flex flex-col app-body'>
+        <div className = 'flex-grow flex flex-col app-container'>
           <StyledIcon src="/icon.png" alt="Community Icon" />
           <StyledTypography variant="h4" gutterBottom align="center">
             {t('communitySetup')}
@@ -188,7 +172,8 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
               </Step>
             ))}
           </StyledStepper>
-          <Box sx={{ mt: 2 }}>
+          <div className = 'flex flex-col'>
+          <div className = 'flex flex-col mt-2'>
             {activeStep === 0 && (
               <StyledSelect
                 fullWidth
@@ -204,49 +189,16 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
               </StyledSelect>
             )}
             {activeStep === 1 && (
-              <>
-                <StyledTextField
-                  fullWidth
-                  label={t('location')}
-                  value={selectedLocation ? `${selectedLocation?.lat}, ${selectedLocation?.lng}` : ''}
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                    }
-                  }}
-                />
-                <Button 
-                  onClick={() => setShowLocationPicker(true)}
-                  fullWidth
-                  variant="outlined"
-                  sx={{ mt: 1 }}
-                >
-                  {t('pickLocation')}
-                </Button>
-                <Modal
-                  open={showLocationPicker}
-                  onClose={() => setShowLocationPicker(false)}
-                  aria-labelledby="location-picker-modal"
-                  aria-describedby="location-picker-description"
-                >
-                  <Box sx={{ 
-                    position: 'absolute', 
-                    top: '50%', 
-                    left: '50%', 
-                    transform: 'translate(-50%, -50%)',
-                    width: '90%',
-                    maxWidth: 400,
-                  }}>
-                      <GoogleMapsProvider language={language}>
-                        <LocationPicker
-                          onLocationSelect={handleLocationSelect}
-                          onClose={() => setShowLocationPicker(false)}
-                          language={language}
-                        />
-                      </GoogleMapsProvider>
-                  </Box>
-                </Modal>
-              </>
+              <div className = 'flex flex-col'>
+                <StyledMap>
+                  <GoogleMapsProvider language={language}>
+                    <LocationPicker
+                      onLocationSelect={handleLocationSelect}
+                      language={language}
+                    />
+                  </GoogleMapsProvider>
+                </StyledMap>
+              </div>
             )}
             {activeStep === 2 && (
               <StyledTextField
@@ -258,7 +210,8 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
                 onChange={(e) => setDescription(e.target.value)}
               />
             )}
-            <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+          </div>
+          <div className = 'flex flex-row pt-2'>
               {activeStep > 0 && (
                 <StyledButton
                   color="inherit"
@@ -272,11 +225,11 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
               <StyledButton onClick={handleNext}>
                 {activeStep === steps.length - 1 ? t('finish') : t('next')}
               </StyledButton>
-            </Box>
-          </Box>
-        </StyledContent>
-      </StyledContainer>
-    </div>
+            </div>
+            </div>
+        </div>
+      </div>
+    </CustomThemeProvider>
   );
 };
 

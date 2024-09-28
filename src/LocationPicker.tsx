@@ -5,7 +5,6 @@ import { createTranslationFunction } from './utils';
 
 interface LocationPickerProps {
   onLocationSelect: (lat: number, lng: number) => void;
-  onClose: () => void;
   language: 'en' | 'ru';
 }
 
@@ -21,7 +20,7 @@ const StyledBox = styled(Box)({
   borderRadius: '8px',
 });
 
-const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, onClose, language }) => {
+const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, language }) => {
   const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({ lat: 0, lng: 0 });
@@ -53,15 +52,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, onClo
         lng: e.latLng.lng()
       };
       setSelectedLocation(newLocation);
+      onLocationSelect(newLocation.lat, newLocation.lng);
     }
   }, []);
-
-  const handleConfirm = useCallback(() => {
-    if (selectedLocation) {
-      onLocationSelect(selectedLocation.lat, selectedLocation.lng);
-      onClose();
-    }
-  }, [selectedLocation, onLocationSelect, onClose]);
 
   const onMapLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -96,23 +89,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, onClo
             {t('clickMapToSelectLocation')}
           </Typography>
         )}
-      </Box>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Button 
-          onClick={handleConfirm} 
-          variant="contained" 
-          disabled={!selectedLocation}
-          fullWidth
-        >
-          {t('confirm')}
-        </Button>
-        <Button 
-          onClick={onClose} 
-          variant="outlined" 
-          fullWidth
-        >
-          {t('cancel')}
-        </Button>
       </Box>
     </StyledBox>
   );
