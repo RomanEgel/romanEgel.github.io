@@ -47,7 +47,7 @@ export interface LocalsItem {
 
 export interface LocalsCommunity {
   id: string;
-  chatId: string;
+  chatId: number;
   name: string;
   status: 'SETUP' | 'READY';
   language: 'en' | 'ru';

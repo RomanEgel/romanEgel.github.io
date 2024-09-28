@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { MessageCircle, UserCircle, Trash2, Pencil } from 'lucide-react';
-import { ListItem } from './types';
+import { ListItem, LocalsCommunity } from './types';
 import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 import { 
   Dialog, 
@@ -28,6 +28,7 @@ import { CustomThemeProvider, getCSSVariableValue } from './CustomThemeProvider'
 
 interface CardDetailViewProps {
   item: ListItem;
+  community: LocalsCommunity;
   active_tab: string;
   onClose: () => void;
   communityLanguage: 'en' | 'ru';
@@ -76,6 +77,7 @@ const StyledTextField = styled(MuiTextField)(({ theme }) => ({
 
 const CardDetailView: React.FC<CardDetailViewProps> = ({ 
   item, 
+  community,
   active_tab,
   onClose, 
   communityLanguage, 
@@ -114,7 +116,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
     );
   };
 
-  const messageLink = `https://t.me/c/${item.communityId.toString().slice(4)}/${item.messageId}`;
+  const messageLink = `https://t.me/c/${community.chatId.toString().slice(4)}/${item.messageId}`;
 
   let contactText;
   switch (active_tab) {

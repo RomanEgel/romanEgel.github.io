@@ -375,6 +375,7 @@ function App({ community, user }: AppProps) {
       {selectedItem ? (
         <CardDetailView
           item={selectedItem}
+          community={community}
           active_tab={activeTab}
           onClose={handleCloseDetailView}
           communityLanguage={community.language}
