@@ -146,9 +146,9 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
   const t = createTranslationFunction(language);
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [entitySettings, setEntitySettings] = useState<EntityExtractionSettings>({
-    eventHashtag: '#events',
-    itemHashtag: '#items',
-    serviceHashtag: '#services',
+    eventHashtag: '#event',
+    itemHashtag: '#item',
+    serviceHashtag: '#service',
     newsHashtag: '#news',
   });
 
