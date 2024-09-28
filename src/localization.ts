@@ -61,6 +61,7 @@ export const translations = {
     noItemsFound: 'No items found',
     noServicesFound: 'No services found',
     noNewsFound: 'No news found',
+    loading: 'Loading...',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -116,12 +117,13 @@ export const translations = {
     item: 'товар',
     service: 'услугу',
     news: 'новость',
+    createNewEntityInstructionPart1: 'Чтобы добавить {{entityType}}, отправьте сообщение c хэштегом:',
+    createNewEntityInstructionPart2: 'в чат сообщества.',
     noEventsFound: 'Нет опубликованных событий',
     noItemsFound: 'Нет опубликованных товаров',
     noServicesFound: 'Нет опубликованных услуг',
     noNewsFound: 'Нет опубликованных новостей',
-    createNewEntityInstructionPart1: 'Чтобы добавить {{entityType}}, отправьте сообщение c хэштегом:',
-    createNewEntityInstructionPart2: 'в чат сообщества.',
+    loading: 'Загрузка...',
   },
 };
 

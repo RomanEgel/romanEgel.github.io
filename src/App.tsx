@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, /*Settings*/ } from 'lucide-react'
+import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, /*Settings*/ } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
@@ -64,7 +64,12 @@ function App({ community, user }: AppProps) {
     return category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   }
 
+  // Add this new state
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  // Modify the fetchData function
   const fetchData = async () => {
+    setIsLoading(true)
     try {
       const [itemsResponse, servicesResponse, eventsResponse, newsResponse] = await Promise.all([
         fetchItems(authorization),
@@ -79,6 +84,8 @@ function App({ community, user }: AppProps) {
       setNews(newsResponse['news']);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false)
     }
   };
 
@@ -203,6 +210,15 @@ function App({ community, user }: AppProps) {
   };
 
   const renderTabContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full p-4">
+          <Loader2 className="h-8 w-8 animate-spin app-text" />
+          <p className="mt-2 text-center app-hint">{t('loading')}</p>
+        </div>
+      );
+    }
+
     if (filteredItems.length === 0) {
       const entitySettings = community.entitySettings;
       let hashtag: string;
