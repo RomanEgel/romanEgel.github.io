@@ -14,7 +14,6 @@ import {
   StepLabel,
   Box,
   styled,
-  Modal,
 } from '@mui/material';
 import { LocalsCommunity } from './types';
 import GoogleMapsProvider from './GoogleMapsProvider';

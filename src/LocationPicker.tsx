@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, Marker } from '@react-google-maps/api';
-import { Box, Button, Typography, styled } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 import { createTranslationFunction } from './utils';
 
 interface LocationPickerProps {
