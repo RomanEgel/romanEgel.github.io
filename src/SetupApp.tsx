@@ -193,7 +193,7 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
       <div className="min-h-screen flex flex-col app-body">
         <StyledContainer className="flex-grow flex flex-col app-container">
           <StyledIcon src="/icon.png" alt="Community Icon" />
-          <StyledTypography variant="h4" gutterBottom align="center">
+          <StyledTypography variant="h5" gutterBottom align="center">
             {t('communitySetup')}
           </StyledTypography>
           <StyledStepper activeStep={activeStep} connector={<StyledStepConnector />}>
