@@ -51,6 +51,12 @@ export const translations = {
     itemHashtag: 'Item Hashtag',
     serviceHashtag: 'Service Hashtag',
     newsHashtag: 'News Hashtag',
+    event: 'event',
+    item: 'item',
+    service: 'service',
+    news: 'news',
+    createNewEntityInstructionPart1: 'To create a new {{entityType}}, send a message with the following hashtag:',
+    createNewEntityInstructionPart2: 'in the community chat.',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -102,6 +108,12 @@ export const translations = {
     itemHashtag: 'Хештег товара',
     serviceHashtag: 'Хештег услуги',
     newsHashtag: 'Хештег новости',
+    event: 'мероприятие',
+    item: 'товар',
+    service: 'услугу',
+    news: 'новость',
+    createNewEntityInstructionPart1: 'Чтобы добавить {{entityType}}, отправьте сообщение c хэштегом:',
+    createNewEntityInstructionPart2: 'в чат сообщества.',
   },
 };
 

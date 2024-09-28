@@ -204,9 +204,45 @@ function App({ community, user }: AppProps) {
 
   const renderTabContent = () => {
     if (filteredItems.length === 0) {
+      const entitySettings = community.entitySettings;
+      let hashtag: string;
+      let localizedEntityType: string;
+
+      switch (activeTab) {
+        case 'events':
+          hashtag = entitySettings.eventHashtag;
+          localizedEntityType = t('event');
+          break;
+        case 'items':
+          hashtag = entitySettings.itemHashtag;
+          localizedEntityType = t('item');
+          break;
+        case 'services':
+          hashtag = entitySettings.serviceHashtag;
+          localizedEntityType = t('service');
+          break;
+        case 'news':
+          hashtag = entitySettings.newsHashtag;
+          localizedEntityType = t('news');
+          break;
+        default:
+          throw new Error('Invalid tab');
+      }
+
       return (
-        <div className="flex flex-col items-center justify-center h-full">
-          <p className="text-center app-hint">{t('noRecordsFound')}</p>
+        <div className="flex flex-col items-center justify-center h-full p-4">
+          <p className="text-center app-hint mb-4">{t('noRecordsFound')}</p>
+          <div className="app-card rounded-lg p-4 max-w-sm">
+            <p className="text-center app-hint text-sm mb-2">
+              {t('createNewEntityInstructionPart1').replace('{{entityType}}', localizedEntityType)}
+            </p>
+            <div className="app-button border rounded p-2 text-center">
+              <span className="font-mono app-button-text font-semibold">{hashtag}</span>
+            </div>
+            <p className="text-center app-hint text-sm mt-2">
+              {t('createNewEntityInstructionPart2')}
+            </p>
+          </div>
         </div>
       );
     }

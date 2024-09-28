@@ -51,6 +51,12 @@ export interface LocalsCommunity {
   name: string;
   status: 'SETUP' | 'READY';
   language: 'en' | 'ru';
+  entitySettings: {
+    eventHashtag: string;
+    itemHashtag: string;
+    serviceHashtag: string;
+    newsHashtag: string;
+  };
 }
 
 export interface LocalsUser {
