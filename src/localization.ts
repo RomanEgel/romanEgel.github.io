@@ -62,6 +62,7 @@ export const translations = {
     noServicesFound: 'No services found',
     noNewsFound: 'No news found',
     loading: 'Loading...',
+    add: 'Add',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -124,6 +125,7 @@ export const translations = {
     noServicesFound: 'Нет опубликованных услуг',
     noNewsFound: 'Нет опубликованных новостей',
     loading: 'Загрузка...',
+    add: 'Добавить',
   },
 };
 

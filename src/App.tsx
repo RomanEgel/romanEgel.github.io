@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, /*Settings*/ } from 'lucide-react'
+import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, Plus /*Settings*/ } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
@@ -357,9 +357,11 @@ function App({ community, user }: AppProps) {
 
   const handleInputBlur = () => {
     setIsInputFocused(false);
-    // Expand the Web App, which often closes the keyboard
+    // Blur the active element
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     WebApp.expand();
-    // Add a small delay to ensure the keyboard has time to close
     setTimeout(() => {
       setShowNav(true);
     }, 200);
@@ -496,7 +498,7 @@ function App({ community, user }: AppProps) {
                   </div>
                 )}
               </div>
-              <div className="flex-grow relative">
+              <div className={`relative ${isInputFocused ? 'flex-grow' : 'flex-grow'}`}>
                 <input
                   ref={searchInputRef}
                   type="text"
@@ -505,10 +507,22 @@ function App({ community, user }: AppProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
-                  className="w-full p-2 rounded-lg focus:outline-none focus:ring-2 app-input"
+                  className="w-full p-2 pr-10 rounded-lg focus:outline-none focus:ring-2 app-input"
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
               </div>
+              {!isInputFocused && (
+                <button 
+                  className="p-2 rounded-lg flex items-center justify-center app-button"
+                  onClick={() => {
+                    // TODO: Implement add functionality
+                    console.log('Add button clicked');
+                  }}
+                >
+                  <Plus className="h-5 w-5 mr-1" />
+                  <span className="text-sm">{t('add')}</span>
+                </button>
+              )}
             </div>
           </div>
 
