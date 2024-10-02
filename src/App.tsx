@@ -361,6 +361,9 @@ function App({ community, user }: AppProps) {
     setTimeout(() => {
       setShowNav(true);
     }, 100);
+
+    // Hide the keyboard using WebApp.closeScanQrPopup()
+    WebApp.closeScanQrPopup();
   };
 
   const [reloadData, setReloadData] = useState(false);
