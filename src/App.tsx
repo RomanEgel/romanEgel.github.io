@@ -357,9 +357,10 @@ function App({ community, user }: AppProps) {
 
   const handleInputBlur = () => {
     setIsInputFocused(false);
-    // Blur the active element
-    if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
+    // Blur the specific search input element
+    const searchInputElement = document.getElementById('searchInput') as HTMLInputElement;
+    if (searchInputElement) {
+      searchInputElement.blur();
     }
     WebApp.expand();
     setTimeout(() => {
@@ -500,6 +501,7 @@ function App({ community, user }: AppProps) {
               </div>
               <div className={`relative ${isInputFocused ? 'flex-grow' : 'flex-grow'}`}>
                 <input
+                  id="searchInput"
                   ref={searchInputRef}
                   type="text"
                   placeholder={t('search')}
