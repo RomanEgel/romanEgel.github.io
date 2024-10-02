@@ -39,6 +39,7 @@ if (!initDataRawToUse || !initDataRawToUse.includes('start_param')) {
       if (data.valid) {
         console.log('Validation successful');
         WebApp.ready();
+        WebApp.setHeaderColor(themeParams.header_bg_color);
 
         const Main = () => {
           const handleSetupComplete = () => {
