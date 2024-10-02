@@ -256,8 +256,8 @@ function App({ community, user }: AppProps) {
             <p className="text-center app-hint text-sm mb-2">
               {t('createNewEntityInstructionPart1').replace('{{entityType}}', localizedEntityType)}
             </p>
-            <div className="app-button border rounded p-2 text-center">
-              <span className="font-mono app-button-text font-semibold">{hashtag}</span>
+            <div className="rounded border p-2 text-center">
+              <span className="font-mono app-accent font-semibold">{hashtag}</span>
             </div>
             <p className="text-center app-hint text-sm mt-2">
               {t('createNewEntityInstructionPart2')}
@@ -357,13 +357,12 @@ function App({ community, user }: AppProps) {
 
   const handleInputBlur = () => {
     setIsInputFocused(false);
+    // Expand the Web App, which often closes the keyboard
+    WebApp.expand();
     // Add a small delay to ensure the keyboard has time to close
     setTimeout(() => {
       setShowNav(true);
-    }, 100);
-
-    // Hide the keyboard using WebApp.closeScanQrPopup()
-    WebApp.closeScanQrPopup();
+    }, 200);
   };
 
   const [reloadData, setReloadData] = useState(false);
