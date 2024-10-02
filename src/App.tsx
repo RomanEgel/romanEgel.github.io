@@ -368,6 +368,12 @@ function App({ community, user }: AppProps) {
     }, 200);
   };
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleInputBlur();
+    }
+  };
+
   const [reloadData, setReloadData] = useState(false);
 
   useEffect(() => {
@@ -430,6 +436,23 @@ function App({ community, user }: AppProps) {
       setSelectedItem(null);
     }
   };
+
+  useEffect(() => {
+    const handleTouchStart = (event: TouchEvent) => {
+      if (
+        searchInputRef.current &&
+        !searchInputRef.current.contains(event.target as Node)
+      ) {
+        handleInputBlur();
+      }
+    };
+
+    document.addEventListener('touchstart', handleTouchStart);
+
+    return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col app-body">
@@ -509,6 +532,7 @@ function App({ community, user }: AppProps) {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={handleInputFocus}
                   onBlur={handleInputBlur}
+                  onKeyPress={handleKeyPress}
                   className="w-full p-2 pr-10 rounded-lg focus:outline-none focus:ring-2 app-input"
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
