@@ -63,6 +63,8 @@ export const translations = {
     noNewsFound: 'No news found',
     loading: 'Loading...',
     add: 'Add',
+    category: 'Category',
+    uploadImage: 'Upload Image',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -126,6 +128,8 @@ export const translations = {
     noNewsFound: 'Нет опубликованных новостей',
     loading: 'Загрузка...',
     add: 'Добавить',
+    category: 'Категория',
+    uploadImage: 'Загрузить изображение',
   },
 };
 

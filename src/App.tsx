@@ -8,6 +8,7 @@ import StorageManager from './StorageManager';
 import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
 import { LocalsCommunity, LocalsUser, LocalsItem, LocalsService, LocalsEvent, LocalsNews, ListItem } from './types';
+import CardDetailAdd from './CardDetailAdd';
 
 
 type TabType = 'events' | 'items' | 'services' | 'news'
@@ -454,6 +455,33 @@ function App({ community, user }: AppProps) {
     };
   }, []);
 
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddClick = () => {
+    setIsAdding(true);
+  };
+
+  const handleAddClose = () => {
+    setIsAdding(false);
+  };
+
+  const handleAddItem = async (newItem: ListItem) => {
+    try {
+      // Implement the API call to add the new item
+      // This will depend on your API structure
+      // For example:
+      // await addItem(newItem, authorization);
+      
+      // Set the reload flag to true
+      setReloadData(true);
+      
+      setIsAdding(false);
+    } catch (error) {
+      console.error('Error adding item:', error);
+      setIsAdding(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col app-body">
       {selectedItem ? (
@@ -466,6 +494,13 @@ function App({ community, user }: AppProps) {
           isCurrentUserAuthor={selectedItem.username === user.username}
           onDelete={handleDeleteItem}
           onEdit={handleEditItem}
+        />
+      ) : isAdding ? (
+        <CardDetailAdd
+          community={community}
+          active_tab={activeTab}
+          onClose={handleAddClose}
+          onAdd={handleAddItem}
         />
       ) : (
         <div ref={appContainerRef} className="flex-grow flex flex-col app-container">
@@ -540,10 +575,7 @@ function App({ community, user }: AppProps) {
               {!isInputFocused && (
                 <button 
                   className="p-2 rounded-lg flex items-center justify-center app-button"
-                  onClick={() => {
-                    // TODO: Implement add functionality
-                    console.log('Add button clicked');
-                  }}
+                  onClick={handleAddClick}
                 >
                   <Plus className="h-5 w-5 mr-1" />
                   <span className="text-sm">{t('add')}</span>

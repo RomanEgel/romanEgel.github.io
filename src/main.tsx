@@ -28,9 +28,8 @@ if (import.meta.env.MODE === 'development') {
     .catch(error => console.error('Error sending theme parameters:', error));
 }
 
-if (!initDataRawToUse || !initDataRawToUse.includes('start_param')) {
-  WebApp.showAlert('It seems the app was launched not from community group. Exiting...');
-  WebApp.close();
+if (!initDataRawToUse) {
+  WebApp.showAlert('It seems the app was launched not from telegram. Exiting...', () => WebApp.close());
 } else {
   const authorizationValue = initDataRawToUse;
 

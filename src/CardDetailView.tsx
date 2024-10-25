@@ -4,12 +4,6 @@ import { MessageCircle, UserCircle, Trash2, Pencil } from 'lucide-react';
 import { ListItem, LocalsCommunity } from './types';
 import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
-  TextField as MuiTextField, 
-  Button, 
   Select, 
   MenuItem, 
   InputLabel, 
@@ -23,8 +17,15 @@ import 'dayjs/locale/ru'; // Import Russian locale
 import 'dayjs/locale/en'; // Import English locale
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { theme } from './theme';
-import { styled } from '@mui/system';
 import { CustomThemeProvider, getCSSVariableValue } from './CustomThemeProvider';
+import { 
+  StyledDialog, 
+  StyledDialogTitle, 
+  StyledDialogContent, 
+  StyledDialogActions, 
+  StyledButton, 
+  StyledTextField 
+} from './SharedComponents';
 
 interface CardDetailViewProps {
   item: ListItem;
@@ -36,44 +37,6 @@ interface CardDetailViewProps {
   onDelete?: (item_id: string, active_tab: string) => void; // New prop for delete functionality
   onEdit?: (item: ListItem, active_tab: string) => void; // New prop for edit functionality
 }
-
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-  '& .MuiDialog-paper': {
-    backgroundColor: theme.palette.background.default,
-  },
-}));
-
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary.main,
-  color: theme.palette.secondary.contrastText,
-}));
-
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
-  padding: theme.spacing(3),
-}));
-
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
-  padding: theme.spacing(2),
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  padding: theme.spacing(1, 3),
-  color: getCSSVariableValue('--button-text-color'),
-  backgroundColor: getCSSVariableValue('--button-color'),
-  '&:hover': {
-    backgroundColor: theme.palette.primary.dark,
-  },
-}));
-
-const StyledTextField = styled(MuiTextField)(({ theme }) => ({
-  backgroundColor: getCSSVariableValue("--bg-color"),
-  '& .MuiInputBase-root': {
-    color: theme.palette.text.primary,
-  },
-  '& .MuiInputLabel-root': {
-    color: theme.palette.text.secondary,
-  },
-}));
 
 const CardDetailView: React.FC<CardDetailViewProps> = ({ 
   item, 
