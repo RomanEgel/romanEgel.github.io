@@ -65,6 +65,8 @@ export const translations = {
     add: 'Add',
     category: 'Category',
     uploadImage: 'Upload Image',
+    selectCommunity: "Select the Community",
+    noCommunitiesAvailable: 'No Communities Available',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -130,6 +132,8 @@ export const translations = {
     add: 'Добавить',
     category: 'Категория',
     uploadImage: 'Загрузить изображение',
+    selectCommunity: 'Выберете Сообщество',
+    noCommunitiesAvailable: 'Нет Доступных Сообществ',
   },
 };
 
