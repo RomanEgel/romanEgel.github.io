@@ -467,6 +467,7 @@ function App({ community, user }: AppProps) {
 
   const handleAddItem = async (newItem: ListItem) => {
     try {
+      console.log(newItem);
       // Implement the API call to add the new item
       // This will depend on your API structure
       // For example:
