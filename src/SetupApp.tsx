@@ -156,7 +156,7 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
     if (activeStep === steps.length - 1) {
       try {
         if (selectedLocation) {
-          await saveSetupData({ language, location: selectedLocation, entitySettings }, authorization);
+          await saveSetupData({ language, location: selectedLocation, entitySettings }, authorization, community.id);
           onSetupComplete();
         } else {
           console.error('Location is not selected');

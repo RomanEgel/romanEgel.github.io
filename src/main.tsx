@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Global } from '@emotion/react';
 import App from './App.tsx';
 import SetupApp from './SetupApp';
-import SetupAppRequired from './SetupAppRequired.tsx'; // Add this line
+import SetupAppRequired from './SetupAppRequired.tsx';
 import './index.css';
 
 import WebApp from '@twa-dev/sdk';
@@ -11,7 +11,8 @@ import { ThemeParams } from '@twa-dev/types';
 import { validateAuthorization, sendThemeParams } from './apiService';
 import { AuthProvider } from './AuthContext';
 import { createAppStyles } from './AppStyles';
-import CommunitiesPicker from './CommunitiesPicker.tsx'; // Add this line
+import CommunitiesPicker from './CommunitiesPicker.tsx';
+import { LocalsCommunity } from './types.ts';
 
 let initDataRawToUse: string;
 let themeParams: ThemeParams;
@@ -43,36 +44,47 @@ if (!initDataRawToUse) {
         WebApp.setHeaderColor(themeParams.header_bg_color);
 
         const Main = () => {
+          const [communityId, setCommunityId] = useState<string | null>(
+            data.community_is_not_specified ? null : data.community.id
+          );
+
           const handleSetupComplete = () => {
-            // Reload the entire page
             window.location.reload();
           };
 
-          const handleCommunitySelect = (communityId: string) => {
-            console.log('Selected Community ID:', communityId);
-            // Handle the selected community ID as needed
+          const handleCommunitySelect = (selectedCommunityId: string) => {
+            console.log('Selected Community ID:', selectedCommunityId);
+            setCommunityId(selectedCommunityId);
           };
 
-          return (
-            data.community_is_not_specified ? (
+          if (communityId === null && data.communities && data.communities.length > 1) {
+            return (
               <CommunitiesPicker 
                 communities={data.communities} 
                 onCommunitySelect={handleCommunitySelect} 
               />
+            );
+          } 
+          
+          let community: LocalsCommunity;
+          if (communityId === null && data.communities && data.communities.length === 1) {
+            setCommunityId(data.communities[0].id);
+            community = data.communities[0];
+          } else {
+            community = data.community || data.communities.find((c: { id: string }) => c.id === communityId);
+          }
+
+
+          return community.status === 'READY' ? (
+            <App community={community} user={data.user} />
+          ) : (
+            data.admin ? (
+              <SetupApp 
+                onSetupComplete={handleSetupComplete} 
+                community={community}
+              />
             ) : (
-              data.ready ? (
-                <App community={data.community} user={data.user} />
-              ) : (
-                ( data.admin ?
-                  (<SetupApp 
-                    onSetupComplete={handleSetupComplete} 
-                    community={data.community}
-                  />)
-                  : (
-                    <SetupAppRequired community={data.community} />
-                  )
-                )
-              )
+              <SetupAppRequired community={community} />
             )
           );
         };
@@ -97,4 +109,3 @@ if (!initDataRawToUse) {
       WebApp.close();
     });
 }
-

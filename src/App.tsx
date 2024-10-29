@@ -73,10 +73,10 @@ function App({ community, user }: AppProps) {
     setIsLoading(true)
     try {
       const [itemsResponse, servicesResponse, eventsResponse, newsResponse] = await Promise.all([
-        fetchItems(authorization),
-        fetchServices(authorization),
-        fetchEvents(authorization),
-        fetchNews(authorization)
+        fetchItems(authorization, community.id),
+        fetchServices(authorization, community.id),
+        fetchEvents(authorization, community.id),
+        fetchNews(authorization, community.id)
       ]);
 
       setItems(itemsResponse['items']);
@@ -388,16 +388,16 @@ function App({ community, user }: AppProps) {
     try {
       switch (active_tab) {
         case 'items':
-          await updateItem(item as LocalsItem, authorization);
+          await updateItem(item as LocalsItem, authorization, community.id);
           break;
         case 'services':
-          await updateService(item as LocalsService, authorization);
+          await updateService(item as LocalsService, authorization, community.id);
           break;
         case 'events':
-          await updateEvent(item as LocalsEvent, authorization);
+          await updateEvent(item as LocalsEvent, authorization, community.id);
           break;
         case 'news':
-          await updateNews(item as LocalsNews, authorization);
+          await updateNews(item as LocalsNews, authorization, community.id);
           break;
       }
       
@@ -415,16 +415,16 @@ function App({ community, user }: AppProps) {
     try {
       switch (active_tab) {
         case 'items':
-          await deleteItem(item_id, authorization);
+          await deleteItem(item_id, authorization, community.id);
           break;
         case 'services':
-          await deleteService(item_id, authorization);
+          await deleteService(item_id, authorization, community.id);
           break;
         case 'events':
-          await deleteEvent(item_id, authorization);
+          await deleteEvent(item_id, authorization, community.id  );
           break;
         case 'news':
-          await deleteNews(item_id, authorization);
+          await deleteNews(item_id, authorization, community.id);
           break;
       }
       
