@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, Plus /*Settings*/ } from 'lucide-react'
+import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, Plus /*Settings*/, ChevronLeft, ChevronRight } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
@@ -17,6 +17,63 @@ interface AppProps {
   community: LocalsCommunity;
   user: LocalsUser;
 }
+
+const ImageCarousel = ({ images }: { images: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
+  if (!images || images.length === 0) {
+    return (
+      <div className="w-24 h-24 flex-shrink-0 bg-gray-200 app-image-container" />
+    );
+  }
+
+  return (
+    <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
+      <img 
+        src={images[currentIndex]} 
+        alt="Item" 
+        className="absolute inset-0 w-full h-full object-cover object-center"
+        style={{ objectPosition: '50% 50%' }}
+      />
+      {images.length > 1 && (
+        <>
+          <button 
+            onClick={goToPrevious}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-r"
+          >
+            <ChevronLeft className="h-4 w-4 text-white" />
+          </button>
+          <button 
+            onClick={goToNext}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-l"
+          >
+            <ChevronRight className="h-4 w-4 text-white" />
+          </button>
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
+            {images.map((_, index) => (
+              <div 
+                key={index}
+                className={`h-1 w-1 rounded-full ${
+                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 function App({ community, user }: AppProps) {
   const { authorization } = useAuth();
@@ -275,18 +332,12 @@ function App({ community, user }: AppProps) {
             onClick={() => handleItemClick(item)}
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >
-            <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
-              <img 
-                src={item.image} 
-                alt={item.title} 
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {item.username === user.username && (
-                <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
-                  <UserCircle2 className="h-4 w-4" />
-                </div>
-              )}
-            </div>
+            <ImageCarousel images={item.images || []} />
+            {item.username === user.username && (
+              <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
+                <UserCircle2 className="h-4 w-4" />
+              </div>
+            )}
             <div className="p-4 flex-grow min-w-0">
               <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
               {'price' in item && 'currency' in item && (

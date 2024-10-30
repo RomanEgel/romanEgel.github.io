@@ -3,7 +3,7 @@ export type ListItem = LocalsItem | LocalsService | LocalsEvent | LocalsNews;
 interface BaseItem {
   id: string;
   title: string;
-  image: string;
+  images: string[];
   author: string;
   username: string;
   publishedAt: string;
@@ -28,22 +28,6 @@ export interface LocalsEvent extends BaseItem {
 }
 
 export interface LocalsNews extends BaseItem {}
-
-
-export interface LocalsItem {
-  id: string
-  title: string
-  price: number
-  currency: string
-  image: string
-  author: string
-  username: string
-  publishedAt: string
-  category: string
-  description: string
-  communityId: number
-  messageId: number
-}
 
 export interface LocalsCommunity {
   id: string;

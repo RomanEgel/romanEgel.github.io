@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-import { MessageCircle, UserCircle, Trash2, Pencil } from 'lucide-react';
+import { MessageCircle, UserCircle, Trash2, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ListItem, LocalsCommunity } from './types';
 import { formatDate, formatPrice, createTranslationFunction, showConfirm } from './utils';
 import { 
@@ -37,6 +37,103 @@ interface CardDetailViewProps {
   onDelete?: (item_id: string, active_tab: string) => void; // New prop for delete functionality
   onEdit?: (item: ListItem, active_tab: string) => void; // New prop for edit functionality
 }
+
+const DetailImageCarousel = ({ images }: { images: string[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+
+  const goToNext = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImageLoaded(false);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+  };
+
+  const goToPrevious = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImageLoaded(false);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+  };
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.target as HTMLImageElement;
+    setImageDimensions({
+      width: img.naturalWidth,
+      height: img.naturalHeight
+    });
+    setImageLoaded(true);
+  };
+
+  if (!images || images.length === 0) {
+    return (
+      <div className="w-full h-64 md:h-80 lg:h-96 bg-gray-200 app-image-container flex items-center justify-center">
+        <div className="text-gray-400">No image available</div>
+      </div>
+    );
+  }
+
+  const getImageStyle = () => {
+    if (!imageLoaded) return {};
+    
+    const aspectRatio = imageDimensions.width / imageDimensions.height;
+    const containerAspectRatio = 16 / 9; // Typical container aspect ratio
+
+    return {
+      objectFit: aspectRatio > containerAspectRatio ? 'contain' : 'cover',
+      maxHeight: '100%',
+      maxWidth: '100%',
+      margin: 'auto'
+    } as React.CSSProperties;
+  };
+
+  return (
+    <div className="w-full h-64 md:h-80 lg:h-96 relative app-image-container bg-black/5">
+      {!imageLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="animate-pulse bg-gray-200 w-full h-full" />
+        </div>
+      )}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <img 
+          src={images[currentIndex]} 
+          alt="Item" 
+          className="transition-opacity duration-300"
+          style={{
+            ...getImageStyle(),
+            opacity: imageLoaded ? 1 : 0
+          }}
+          onLoad={handleImageLoad}
+        />
+      </div>
+      {images.length > 1 && (
+        <>
+          <button 
+            onClick={goToPrevious}
+            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors"
+          >
+            <ChevronLeft className="h-6 w-6 text-white" />
+          </button>
+          <button 
+            onClick={goToNext}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors"
+          >
+            <ChevronRight className="h-6 w-6 text-white" />
+          </button>
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+            {images.map((_, index) => (
+              <div 
+                key={index}
+                className={`h-2 w-2 rounded-full transition-colors ${
+                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 const CardDetailView: React.FC<CardDetailViewProps> = ({ 
   item, 
@@ -154,13 +251,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
         </div>
 
         <div className="flex-grow overflow-y-auto app-card-detail-content">
-          <div className="w-full h-64 md:h-80 lg:h-96 relative app-image-container">
-            <img 
-              src={item.image} 
-              alt={item.title} 
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <DetailImageCarousel images={item.images || []} />
           
           <div className="p-4" style={{ color: theme.palette.text.primary }}>
             {!isEditing && (
