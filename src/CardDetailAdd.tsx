@@ -46,7 +46,7 @@ const CardDetailAdd: React.FC<CardDetailAddProps> = ({
     title: '',
     description: '',
     category: '',
-    image: '',
+    images: [],
     ...(active_tab === 'items' || active_tab === 'services' ? { price: 0, currency: 'USD' } : {}),
     ...(active_tab === 'events' ? { date: new Date().toISOString() } : {}),
   });
@@ -203,8 +203,8 @@ const CardDetailAdd: React.FC<CardDetailAddProps> = ({
                 {t('uploadImage')}
               </Button>
             </label>
-            {newItem.image && (
-              <img src={newItem.image} alt="Preview" style={{ width: '100%', marginTop: '10px' }} />
+            {newItem.images && newItem.images.length > 0 && (
+              <img src={newItem.images[0]} alt="Preview" style={{ width: '100%', marginTop: '10px' }} />
             )}
           </StyledDialogContent>
           <StyledDialogActions>
