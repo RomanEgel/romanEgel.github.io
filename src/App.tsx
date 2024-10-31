@@ -1,7 +1,7 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, Plus /*Settings*/, ChevronLeft, ChevronRight } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews } from './apiService'
+import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
 import StorageManager from './StorageManager';
@@ -187,7 +187,7 @@ function App({ community, user }: AppProps) {
     const categories = ['all', ...uniqueCategories];
 
     // Add "My items/services/events" category if user has any records
-    const hasUserRecords = result.some(item => item.username === user.username);
+    const hasUserRecords = result.some(item => item.userId === user.id);
     if (hasUserRecords) {
       categories.unshift(`my ${activeTab}`);
     }
@@ -195,7 +195,7 @@ function App({ community, user }: AppProps) {
     return categories;
   };
 
-  const categories = useMemo(() => getCategories(), [activeTab, items, services, events, news, user.username]);
+  const categories = useMemo(() => getCategories(), [activeTab, items, services, events, news, user.id]);
 
   const filteredItems = useMemo(() => {
     let result: ListItem[] = 
@@ -205,7 +205,7 @@ function App({ community, user }: AppProps) {
       news
 
     if (activeCategory.startsWith('my ')) {
-      result = result.filter(item => item.username === user.username)
+      result = result.filter(item => item.userId === user.id)
     } else if (activeCategory !== 'all') {
       result = result.filter(item => item.category === activeCategory)
     }
@@ -220,7 +220,7 @@ function App({ community, user }: AppProps) {
     }
 
     return result
-  }, [activeTab, activeCategory, searchQuery, items, services, events, news, user.username])
+  }, [activeTab, activeCategory, searchQuery, items, services, events, news, user.id])
 
   useEffect(() => {
     setActiveCategory('all')
@@ -333,7 +333,7 @@ function App({ community, user }: AppProps) {
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >
             <ImageCarousel images={item.images || []} />
-            {item.username === user.username && (
+            {item.userId === user.id && (
               <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
                 <UserCircle2 className="h-4 w-4" />
               </div>
@@ -356,7 +356,9 @@ function App({ community, user }: AppProps) {
                   {t('postedBy')} <span 
                     onClick={(e) => {
                       e.stopPropagation();
-                      openTelegramLink(`https://t.me/${item.username}`);
+                      getLinkToUserProfile(item.userId, authorization, community.id).then(link => {
+                        openTelegramLink(link);
+                      });
                     }}
                     className="app-author hover:underline cursor-pointer"
                   >
@@ -534,6 +536,12 @@ function App({ community, user }: AppProps) {
     }
   };
 
+  const handleOpenUserProfile = (userId: string, text: string) => {
+    getLinkToUserProfile(userId, authorization, community.id).then(link => {
+      openTelegramLink(`${link}?text=${encodeURIComponent(text)}`);
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col app-body">
       {selectedItem ? (
@@ -541,9 +549,10 @@ function App({ community, user }: AppProps) {
           item={selectedItem}
           community={community}
           active_tab={activeTab}
+          onOpenUserProfile={handleOpenUserProfile}
           onClose={handleCloseDetailView}
           communityLanguage={community.language}
-          isCurrentUserAuthor={selectedItem.username === user.username}
+          isCurrentUserAuthor={selectedItem.userId === user.id}
           onDelete={handleDeleteItem}
           onEdit={handleEditItem}
         />

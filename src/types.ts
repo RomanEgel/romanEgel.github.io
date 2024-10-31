@@ -5,7 +5,7 @@ interface BaseItem {
   title: string;
   images: string[];
   author: string;
-  username: string;
+  userId: string;
   publishedAt: string;
   category: string;
   description: string;
@@ -44,6 +44,7 @@ export interface LocalsCommunity {
 }
 
 export interface LocalsUser {
+  id: string;
   first_name: string;
   last_name: string;
   username: string;

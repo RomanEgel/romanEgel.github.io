@@ -158,6 +158,16 @@ export async function updateNews(news: LocalsNews, authorization: string, commun
   });
 }
 
+export async function getLinkToUserProfile(userId: string, authorization: string, communityId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/users/${userId}/_resolve-link`, {
+    headers: {
+      Authorization: `tma ${authorization}`,
+      'X-Community-Id': communityId
+    }
+  });
+  return (await response.json())['link'];
+}
+
 interface SetupData {
   language: string;
   location: {lat: number, lng: number};

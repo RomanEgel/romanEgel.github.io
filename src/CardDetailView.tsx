@@ -31,6 +31,7 @@ interface CardDetailViewProps {
   item: ListItem;
   community: LocalsCommunity;
   active_tab: string;
+  onOpenUserProfile: (userId: string, text: string) => void;
   onClose: () => void;
   communityLanguage: 'en' | 'ru';
   isCurrentUserAuthor: boolean; // New prop
@@ -139,6 +140,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
   item, 
   community,
   active_tab,
+  onOpenUserProfile,
   onClose, 
   communityLanguage, 
   isCurrentUserAuthor,
@@ -178,7 +180,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
 
   const messageLink = `https://t.me/c/${community.chatId.toString().slice(4)}/${item.messageId}`;
 
-  let contactText;
+  let contactText: string;
   switch (active_tab) {
     case 'items':
       contactText = t('interestedInItemMessage');
@@ -193,7 +195,6 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
       contactText = t('interestedInNewsMessage');
       break;
   }
-  const contactAuthorLink = `https://t.me/${item.username}?text=${encodeURIComponent(contactText + item.title)}`;
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -296,7 +297,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
                   <>
                     <div className="w-0.5"/>
                     <button
-                      onClick={() => openTelegramLink(contactAuthorLink)}
+                      onClick={() => onOpenUserProfile(item.userId, contactText + item.title)}
                       className="flex-1 py-4 app-button"
                     >
                       <UserCircle className="h-5 w-5 inline-block mr-2" />
