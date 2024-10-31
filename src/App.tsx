@@ -8,7 +8,6 @@ import StorageManager from './StorageManager';
 import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
 import { LocalsCommunity, LocalsUser, LocalsItem, LocalsService, LocalsEvent, LocalsNews, ListItem } from './types';
-import CardDetailAdd from './CardDetailAdd';
 
 
 type TabType = 'events' | 'items' | 'services' | 'news'
@@ -114,6 +113,9 @@ function App({ community, user }: AppProps) {
   const getCategoryDisplayName = (category: string) => {
     if (category === 'all') {
       return t('all');
+    }
+    if (category === 'Uncategorized') {
+      return t('uncategorized');
     }
     if (category.startsWith('my ')) {
       const type = category.split(' ')[1];
@@ -510,34 +512,6 @@ function App({ community, user }: AppProps) {
     };
   }, []);
 
-  const [isAdding, setIsAdding] = useState(false);
-
-  const handleAddClick = () => {
-    setIsAdding(true);
-  };
-
-  const handleAddClose = () => {
-    setIsAdding(false);
-  };
-
-  const handleAddItem = async (newItem: ListItem) => {
-    try {
-      console.log(newItem);
-      // Implement the API call to add the new item
-      // This will depend on your API structure
-      // For example:
-      // await addItem(newItem, authorization);
-      
-      // Set the reload flag to true
-      setReloadData(true);
-      
-      setIsAdding(false);
-    } catch (error) {
-      console.error('Error adding item:', error);
-      setIsAdding(false);
-    }
-  };
-
   const handleOpenUserProfile = (userId: string, text: string) => {
     getLinkToUserProfile(userId, authorization, community.id).then(link => {
       openTelegramLink(`${link}?text=${encodeURIComponent(text)}`);
@@ -559,13 +533,6 @@ function App({ community, user }: AppProps) {
           isCurrentUserAuthor={selectedItem.userId === user.id}
           onDelete={handleDeleteItem}
           onEdit={handleEditItem}
-        />
-      ) : isAdding ? (
-        <CardDetailAdd
-          community={community}
-          active_tab={activeTab}
-          onClose={handleAddClose}
-          onAdd={handleAddItem}
         />
       ) : (
         <div ref={appContainerRef} className="flex-grow flex flex-col app-container">
@@ -637,15 +604,6 @@ function App({ community, user }: AppProps) {
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 app-search-icon" />
               </div>
-              {!isInputFocused && (
-                <button 
-                  className="p-2 rounded-lg flex items-center justify-center app-button"
-                  onClick={handleAddClick}
-                >
-                  <Plus className="h-5 w-5 mr-1" />
-                  <span className="text-sm">{t('add')}</span>
-                </button>
-              )}
             </div>
           </div>
 

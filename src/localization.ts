@@ -67,6 +67,7 @@ export const translations = {
     uploadImage: 'Upload Image',
     selectCommunity: "Select the Community",
     noCommunitiesAvailable: 'No Communities Available',
+    uncategorized: 'Other',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -134,8 +135,9 @@ export const translations = {
     uploadImage: 'Загрузить изображение',
     selectCommunity: 'Выберете Сообщество',
     noCommunitiesAvailable: 'Нет Доступных Сообществ',
+    uncategorized: 'Другое',
   },
-};
+} as const;
 
 export function getTranslation(key: keyof typeof translations.en, language: Language): string {
   return translations[language][key] || translations.en[key];
