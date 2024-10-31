@@ -355,8 +355,8 @@ function App({ community, user }: AppProps) {
                 <p className="truncate mr-2 app-author-text">
                   {t('postedBy')} <span 
                     onClick={(e) => {
+                      e.stopPropagation();
                       getLinkToUserProfile(item.userId, authorization, community.id).then(link => {
-                        e.stopPropagation();
                         openTelegramLink(link);
                       }).catch(error => {
                         console.error('Error getting user profile link:', error);
