@@ -521,7 +521,7 @@ function App({ community, user }: AppProps) {
   };
 
   function enableNotificationsForUser(): void {
-    openTelegramLink(`https://t.me/locals_only_bot?text=${encodeURIComponent(`/enable-notifications`)}`);
+    openTelegramLink(`https://t.me/locals_only_bot?text=${encodeURIComponent(`/enable_notifications`)}`);
   }
 
   return (
