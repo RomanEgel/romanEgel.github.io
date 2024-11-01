@@ -123,14 +123,7 @@ const componentStyles = css`
       opacity: 0.8;
     }
   }
-  .app-inactive-button {
-    background-color: var(--hint-color);
-    color: var(--button-text-color);
-    opacity: 0.9;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
+  
   .app-button-delete {
     background-color: var(--destructive-text-color);
     color: var(--button-text-color);

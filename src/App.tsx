@@ -546,11 +546,13 @@ function App({ community, user }: AppProps) {
                 <MapPin className="h-4 w-4 mr-1" />
                 <span className="text-sm">{community.name}</span>
               </div>
-              <div className="flex items-center">
-                <button className={`p-1 rounded-full ${user.notifications_enabled ? 'app-inactive-button' : 'app-button'}`} onClick={() => !user.notifications_enabled && enableNotificationsForUser()}>
-                  <Bell className="h-5 w-5" />
-                </button>
-              </div>
+              {!user.notifications_enabled && (
+                <div className="flex items-center">
+                  <button className={`p-1 rounded-full app-button`} onClick={() => enableNotificationsForUser()}>
+                    <Bell className="h-5 w-5" />
+                  </button>
+                </div>
+              )}
             </div>
           </header>
 
