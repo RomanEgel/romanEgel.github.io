@@ -1,6 +1,6 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
-import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, ChevronLeft, ChevronRight, Bell } from 'lucide-react'
 import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
@@ -520,6 +520,10 @@ function App({ community, user }: AppProps) {
     });
   };
 
+  function enableNotificationsForUser(): void {
+    openTelegramLink(`https://t.me/locals_only_bot?text=${encodeURIComponent(`/enable-notifications`)}`);
+  }
+
   return (
     <div className="min-h-screen flex flex-col app-body">
       {selectedItem ? (
@@ -542,11 +546,11 @@ function App({ community, user }: AppProps) {
                 <MapPin className="h-4 w-4 mr-1" />
                 <span className="text-sm">{community.name}</span>
               </div>
-              {/* <div className="flex items-center">
-                <button className="p-1 rounded-full app-button">
-                  <Settings className="h-5 w-5" />
+              <div className="flex items-center">
+                <button className="p-1 rounded-full app-button" onClick={() => enableNotificationsForUser()}>
+                  <Bell className="h-5 w-5" />
                 </button>
-              </div> */}
+              </div>
             </div>
           </header>
 
