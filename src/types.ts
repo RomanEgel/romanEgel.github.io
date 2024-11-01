@@ -48,4 +48,5 @@ export interface LocalsUser {
   first_name: string;
   last_name: string;
   username: string;
+  notifications_enabled: boolean;
 }

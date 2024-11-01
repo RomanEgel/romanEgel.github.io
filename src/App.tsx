@@ -547,7 +547,7 @@ function App({ community, user }: AppProps) {
                 <span className="text-sm">{community.name}</span>
               </div>
               <div className="flex items-center">
-                <button className="p-1 rounded-full app-button" onClick={() => enableNotificationsForUser()}>
+                <button className={`p-1 rounded-full ${user.notifications_enabled ? 'app-inactive-button' : 'app-button'}`} onClick={() => !user.notifications_enabled && enableNotificationsForUser()}>
                   <Bell className="h-5 w-5" />
                 </button>
               </div>
