@@ -151,12 +151,29 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
     }
   };
 
-  // Add this helper function at the top level of the component
+  // Modify the scrollToEntity function
   const scrollToEntity = (entityId: string, retries = 5) => {
     const targetElement = document.querySelector(`[data-entity-id="${entityId}"]`);
     if (targetElement) {
       console.log('Found target element, scrolling...');
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Ensure we have full viewport height
+      WebApp.expand();
+      
+      // Get the main content container
+      const mainContent = document.querySelector('.app-main-content');
+      if (mainContent) {
+        // Calculate scroll position considering fixed header height (110px)
+        const headerOffset = 110;
+        const elementPosition = targetElement.getBoundingClientRect().top;
+        const offsetPosition = elementPosition - headerOffset;
+
+        mainContent.scrollBy({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+
       targetElement.classList.add('app-highlight-item');
       setTimeout(() => {
         targetElement.classList.remove('app-highlight-item');
