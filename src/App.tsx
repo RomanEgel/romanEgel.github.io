@@ -15,6 +15,8 @@ type TabType = 'events' | 'items' | 'services' | 'news'
 interface AppProps {
   community: LocalsCommunity;
   user: LocalsUser;
+  focusEntityType?: string;
+  focusEntityId?: string;
 }
 
 const ImageCarousel = ({ images }: { images: string[] }) => {
@@ -74,7 +76,7 @@ const ImageCarousel = ({ images }: { images: string[] }) => {
   );
 };
 
-function App({ community, user }: AppProps) {
+function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
   const { authorization } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>('events')
   const [activeCategory, setActiveCategory] = useState<string>('all')
@@ -149,15 +151,40 @@ function App({ community, user }: AppProps) {
     }
   };
 
+  // Add this helper function at the top level of the component
+  const scrollToEntity = (entityId: string) => {
+    const targetElement = document.querySelector(`[data-entity-id="${entityId}"]`);
+    if (targetElement) {
+      console.log('Found target element, scrolling...');
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetElement.classList.add('app-highlight-item');
+      setTimeout(() => {
+        targetElement.classList.remove('app-highlight-item');
+      }, 2000);
+    } else {
+      console.log('Failed to find element in the list');
+    }
+  };
+
+  // Modify the useEffect for data fetching
   useEffect(() => {
-    fetchData();
-    
-    // Retrieve the last active tab from StorageManager
-    StorageManager.getItem('lastActiveTab').then((value) => {
-      if (value) {
-        setActiveTab(value as TabType);
+    const init = async () => {
+      await fetchData();
+      
+      if (focusEntityType && focusEntityId) {
+        console.log('Focusing on:', { focusEntityType, focusEntityId });
+        setActiveTab(focusEntityType as TabType);
+        scrollToEntity(focusEntityId);
+      } else {
+        // Retrieve the last active tab from StorageManager
+        const value = await StorageManager.getItem('lastActiveTab');
+        if (value) {
+          setActiveTab(value as TabType);
+        }
       }
-    });
+    };
+
+    init();
   }, []);
 
   // Modify the updateActiveTab function
@@ -330,7 +357,8 @@ function App({ community, user }: AppProps) {
       <div className="flex flex-col space-y-4 mb-16 w-full">
         {filteredItems.map((item) => (
           <div 
-            key={item.id} 
+            key={item.id}
+            data-entity-id={item.id}
             onClick={() => handleItemClick(item)}
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >

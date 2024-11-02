@@ -322,6 +322,29 @@ const textStyles = css`
   }
 `
 
+const animationStyles = css`
+  @keyframes highlightPulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 var(--button-color);
+    }
+    50% {
+      transform: scale(1.01);
+      box-shadow: 0 0 0 4px var(--button-color);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 var(--button-color);
+    }
+  }
+
+  .app-highlight-item {
+    animation: highlightPulse 1s ease-in-out;
+    position: relative;
+    z-index: 1;
+  }
+`
+
 export const createAppStyles = (theme_params: ThemeParams) => css`
   ${createCSSVariables(theme_params)}
   ${baseStyles}
@@ -329,4 +352,5 @@ export const createAppStyles = (theme_params: ThemeParams) => css`
   ${componentStyles}
   ${textStyles}
   ${responsiveStyles}
+  ${animationStyles}
 `
