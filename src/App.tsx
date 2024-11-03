@@ -152,7 +152,7 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
   };
 
   // Modify the scrollToEntity function
-  const scrollToEntity = (entityId: string, retries = 5) => {
+  const scrollToEntity = (entityId: string) => {
     const targetElement = document.querySelector(`[data-entity-id="${entityId}"]`);
     if (targetElement) {
       console.log('Found target element, scrolling...');
@@ -178,11 +178,9 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
       setTimeout(() => {
         targetElement.classList.remove('app-highlight-item');
       }, 2000);
-    } else if (retries > 0) {
-      console.log(`Element not found, retrying... (${retries} attempts left)`);
-      setTimeout(() => scrollToEntity(entityId, retries - 1), 500);
     } else {
-      console.log('Failed to find element after all retries');
+      console.log(`Failed to find entity ${entityId}`);
+      WebApp.showAlert(t('failedToFindEntity'));
     }
   };
 

@@ -68,6 +68,7 @@ export const translations = {
     selectCommunity: "Select the Community",
     noCommunitiesAvailable: 'No Communities Available',
     uncategorized: 'Other',
+    failedToFindEntity: 'Not Found',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -136,6 +137,7 @@ export const translations = {
     selectCommunity: 'Выберете Сообщество',
     noCommunitiesAvailable: 'Нет Доступных Сообществ',
     uncategorized: 'Другое',
+    failedToFindEntity: 'Не найдено',
   },
 } as const;
 
