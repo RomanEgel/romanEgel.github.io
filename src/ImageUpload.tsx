@@ -85,7 +85,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
     if (!fileList) return;
 
     const files = Array.from(fileList);
-    WebApp.showConfirm(t('confirmImages').replace('{{num}}', files.length.toString()));
 
     if (files.length + images.length > maxImages) {
       WebApp.showAlert(
@@ -213,15 +212,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleFileSelect}
+            //accept="image/*"
+              onChange={(event) => {
+                WebApp.showConfirm(t('confirmImagesUpload'));
+                handleFileSelect(event)
+              }}
               style={{ display: 'none' }}
               multiple
-              capture={undefined}
-              onClick={(event) => {
-                const element = event.target as HTMLInputElement;
-                element.value = '';
-              }}
             />
             <AddPhotoAlternateIcon sx={{ fontSize: 40, color: 'var(--hint-color)' }} />
             <Typography variant="caption" sx={{ color: 'var(--hint-color)' }}>

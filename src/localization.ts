@@ -98,7 +98,7 @@ export const translations = {
     addImage: 'Add Image',
     invalidImageFormat: 'Please select valid image files only',
     imageLoadError: 'Failed to load image',
-    confirmImages: 'Are you sure you want to upload {{num}} images?',
+    confirmImagesUpload: 'You uploaded images',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -197,7 +197,7 @@ export const translations = {
     addImage: 'Добавить изображение',
     invalidImageFormat: 'Пожалуйста, выберите только файлы изображений',
     imageLoadError: 'Не удалось загрузить изображение',
-    confirmImages: 'Вы уверены, что хотите загрузить {{num}} изображений?',
+    confirmImagesUpload: 'Вы загрузили изображения',
   },
 } as const;
 
