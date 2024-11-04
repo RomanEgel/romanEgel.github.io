@@ -93,9 +93,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
       return;
     }
 
-    // Check if we're on Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
-
     // Validate and process each file
     const processedFiles = await Promise.all(
       files.map(async (file) => {
@@ -105,50 +102,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
           return null;
         }
 
-        // Special handling only for Android gallery files
-        if (isAndroid && (file.type === 'image/jpeg' || file.type === 'image/png')) {
-          return new Promise<File | null>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const img = new Image();
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                
-                const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                  resolve(null);
-                  return;
-                }
-                
-                ctx.drawImage(img, 0, 0);
-                
-                canvas.toBlob((blob) => {
-                  if (blob) {
-                    const newFile = new File([blob], file.name, {
-                      type: file.type,
-                      lastModified: new Date().getTime()
-                    });
-                    resolve(newFile);
-                  } else {
-                    resolve(null);
-                  }
-                }, file.type);
-              };
-              
-              img.onerror = () => resolve(null);
-              img.src = e.target?.result as string;
-            };
-            reader.onerror = () => {
-              WebApp.showAlert(t('imageLoadError'));
-              resolve(null);
-            };
-            reader.readAsDataURL(file);
-          });
-        }
-
-        // For non-Android platforms or other file types, use the file directly
         return file;
       })
     );
@@ -214,7 +167,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
               type="file"
             //accept="image/*"
               onChange={(event) => {
-                WebApp.showConfirm(t('confirmImagesUpload'));
                 handleFileSelect(event)
               }}
               style={{ display: 'none' }}
