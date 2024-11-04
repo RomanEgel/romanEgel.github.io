@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { styled } from '@mui/material/styles';
 import { Typography, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -85,7 +85,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
     if (!fileList) return;
 
     const files = Array.from(fileList);
-    console.log('Selected files:', files); // Debug log
+    WebApp.showConfirm(t('confirmImages').replace('{{num}}', files.length.toString()));
 
     if (files.length + images.length > maxImages) {
       WebApp.showAlert(
@@ -93,6 +93,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
       );
       return;
     }
+
+    // Check if we're on Android
+    const isAndroid = /Android/i.test(navigator.userAgent);
 
     // Validate and process each file
     const processedFiles = await Promise.all(
@@ -103,28 +106,51 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
           return null;
         }
 
-        // Read the file data using FileReader
-        return new Promise<File | null>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            if (e.target?.result) {
-              // Create a new Blob from the loaded data
-              const blob = new Blob([e.target.result], { type: file.type });
-              const newFile = new File([blob], file.name, {
-                type: file.type,
-                lastModified: new Date().getTime()
-              });
-              resolve(newFile);
-            } else {
+        // Special handling only for Android gallery files
+        if (isAndroid && (file.type === 'image/jpeg' || file.type === 'image/png')) {
+          return new Promise<File | null>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = new Image();
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                  resolve(null);
+                  return;
+                }
+                
+                ctx.drawImage(img, 0, 0);
+                
+                canvas.toBlob((blob) => {
+                  if (blob) {
+                    const newFile = new File([blob], file.name, {
+                      type: file.type,
+                      lastModified: new Date().getTime()
+                    });
+                    resolve(newFile);
+                  } else {
+                    resolve(null);
+                  }
+                }, file.type);
+              };
+              
+              img.onerror = () => resolve(null);
+              img.src = e.target?.result as string;
+            };
+            reader.onerror = () => {
+              WebApp.showAlert(t('imageLoadError'));
               resolve(null);
-            }
-          };
-          reader.onerror = () => {
-            WebApp.showAlert(t('imageLoadError'));
-            resolve(null);
-          };
-          reader.readAsArrayBuffer(file);
-        });
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        // For non-Android platforms or other file types, use the file directly
+        return file;
       })
     );
 
@@ -149,17 +175,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
       return '';
     }
   };
-
-  // Cleanup object URLs when component unmounts or images change
-  useEffect(() => {
-    return () => {
-      images.forEach(image => {
-        if (typeof image === 'object') {
-          URL.revokeObjectURL(URL.createObjectURL(image));
-        }
-      });
-    };
-  }, [images]);
 
   const handleDelete = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
