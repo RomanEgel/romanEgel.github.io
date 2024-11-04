@@ -103,11 +103,27 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
           return null;
         }
 
-        // Create a copy of the file to ensure it's properly handled
-        const blob = new Blob([file], { type: file.type });
-        return new File([blob], file.name, {
-          type: file.type,
-          lastModified: new Date().getTime()
+        // Read the file data using FileReader
+        return new Promise<File | null>((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            if (e.target?.result) {
+              // Create a new Blob from the loaded data
+              const blob = new Blob([e.target.result], { type: file.type });
+              const newFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: new Date().getTime()
+              });
+              resolve(newFile);
+            } else {
+              resolve(null);
+            }
+          };
+          reader.onerror = () => {
+            WebApp.showAlert(t('imageLoadError'));
+            resolve(null);
+          };
+          reader.readAsArrayBuffer(file);
         });
       })
     );
@@ -186,7 +202,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
               onChange={handleFileSelect}
               style={{ display: 'none' }}
               multiple
-              capture="environment"
             />
             <AddPhotoAlternateIcon sx={{ fontSize: 40, color: 'var(--hint-color)' }} />
             <Typography variant="caption" sx={{ color: 'var(--hint-color)' }}>
