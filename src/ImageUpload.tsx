@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import { Typography, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
@@ -12,13 +12,15 @@ const StyledUploadArea = styled('div')({
   flexDirection: 'column',
   alignItems: 'center',
   gap: '16px',
+  maxWidth: '100%',
 });
 
 const StyledImageGrid = styled('div')({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-  gap: '16px',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: '8px',
   width: '100%',
+  maxWidth: '100%',
 });
 
 const StyledImageContainer = styled('div')({
@@ -27,10 +29,7 @@ const StyledImageContainer = styled('div')({
   borderRadius: '8px',
   overflow: 'hidden',
   width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  height: 'auto',
 });
 
 const StyledImage = styled('img')({
@@ -63,6 +62,8 @@ const StyledUploadButton = styled('label')({
   border: '2px dashed var(--hint-color)',
   borderRadius: '8px',
   cursor: 'pointer',
+  width: '100%',
+  height: 'auto',
   '&:hover': {
     backgroundColor: 'var(--secondary-bg-color)',
   },
@@ -84,7 +85,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
     if (!fileList) return;
 
     const files = Array.from(fileList);
-    
+    console.log('Selected files:', files); // Debug log
+
     if (files.length + images.length > maxImages) {
       WebApp.showAlert(
         t('maxImagesError').replace('{{max}}', maxImages.toString())
@@ -92,24 +94,48 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
       return;
     }
 
-    // Validate that files are actually images
-    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    // Validate and process each file
+    const processedFiles = await Promise.all(
+      files.map(async (file) => {
+        // Verify it's an image
+        if (!file.type.startsWith('image/')) {
+          WebApp.showAlert(t('invalidImageFormat'));
+          return null;
+        }
+
+        // Create a copy of the file to ensure it's properly handled
+        const blob = new Blob([file], { type: file.type });
+        return new File([blob], file.name, {
+          type: file.type,
+          lastModified: new Date().getTime()
+        });
+      })
+    );
+
+    // Filter out null values and add valid files
+    const validFiles = processedFiles.filter((file): file is File => file !== null);
     
-    if (validFiles.length !== files.length) {
-      WebApp.showAlert(t('invalidImageFormat'));
-      return;
+    if (validFiles.length > 0) {
+      onChange([...images, ...validFiles]);
     }
 
-    onChange([...images, ...validFiles]);
-
-    // Reset the input
+    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
+  const getImageUrl = (image: File) => {
+    try {
+      return URL.createObjectURL(image);
+    } catch (error) {
+      WebApp.showAlert(t('imageLoadError'));
+      return '';
+    }
+  };
+
   // Cleanup object URLs when component unmounts or images change
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       images.forEach(image => {
         if (typeof image === 'object') {
@@ -127,25 +153,30 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
   return (
     <StyledUploadArea>
       <StyledImageGrid>
-        {images.map((image, index) => (
-          <StyledImageContainer key={`${index}-${image.name}`}>
-            <StyledImage 
-              src={URL.createObjectURL(image)} 
-              alt={t('uploadImageAlt').replace('{{num}}', (index + 1).toString())} 
-              onError={(e) => {
-                console.error('Error loading image:', e);
-                WebApp.showAlert(t('imageLoadError'));
-              }}
-            />
-            <StyledDeleteButton 
-              onClick={() => handleDelete(index)} 
-              size="small"
-              aria-label={t('deleteImage')}
-            >
-              <DeleteIcon fontSize="small" />
-            </StyledDeleteButton>
-          </StyledImageContainer>
-        ))}
+        {images.map((image, index) => {
+          const imageUrl = getImageUrl(image);
+          if (!imageUrl) return null;
+
+          return (
+            <StyledImageContainer key={`${index}-${image.name}`}>
+              <StyledImage 
+                src={imageUrl}
+                alt={t('uploadImageAlt').replace('{{num}}', (index + 1).toString())} 
+                onError={(e) => {
+                  console.error('Error loading image:', e);
+                  WebApp.showAlert(t('imageLoadError'));
+                }}
+              />
+              <StyledDeleteButton 
+                onClick={() => handleDelete(index)} 
+                size="small"
+                aria-label={t('deleteImage')}
+              >
+                <DeleteIcon fontSize="small" />
+              </StyledDeleteButton>
+            </StyledImageContainer>
+          );
+        })}
         {images.length < maxImages && (
           <StyledUploadButton>
             <input
@@ -155,6 +186,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
               onChange={handleFileSelect}
               style={{ display: 'none' }}
               multiple
+              capture="environment"
             />
             <AddPhotoAlternateIcon sx={{ fontSize: 40, color: 'var(--hint-color)' }} />
             <Typography variant="caption" sx={{ color: 'var(--hint-color)' }}>
