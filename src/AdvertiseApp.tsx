@@ -14,6 +14,9 @@ import { CustomThemeProvider } from './CustomThemeProvider';
 import LocationPicker from './LocationPicker';
 import { createTranslationFunction } from './utils';
 import GoogleMapsProvider from './GoogleMapsProvider';
+import AdvertisementForm from './AdvertisementForm';
+import { LocalsItem, LocalsService } from './types';
+import ImageUpload from './ImageUpload';
 
 const StyledMap = styled('div')({
   width: '100%',
@@ -148,6 +151,8 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [advertiseType, setAdvertiseType] = useState<AdvertiseType | null>(null);
   const [range, setRange] = useState<number>(5);
+  const [formData, setFormData] = useState<Partial<LocalsItem | LocalsService> | null>(null);
+  const [images, setImages] = useState<File[]>([]);
   const t = createTranslationFunction(language);
 
   const rangeMarks = [
@@ -175,11 +180,38 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
     // Here you can add the submission logic
   };
 
-  const steps = [t('enterLocation'), t('selectRange'), t('selectAdvertiseType')];
+  const steps = [
+    t('enterLocation'), 
+    t('selectRange'), 
+    t('selectAdvertiseType'),
+    t('uploadImages'),
+    t('enterDetails')
+  ];
 
   const isNextDisabled = (activeStep === 0 && !location) || 
                         (activeStep === 1 && !range) ||
-                        (activeStep === 2 && !advertiseType);
+                        (activeStep === 2 && !advertiseType) ||
+                        (activeStep === 3 && images.length === 0) ||
+                        (activeStep === 4 && !formData);
+
+  const handleFormSubmit = (data: typeof formData) => {
+    setFormData(data);
+    if (activeStep === steps.length - 1) {
+      // Handle final submission
+      console.log('Final submission:', {
+        location,
+        range,
+        advertiseType,
+        formData: data
+      });
+    } else {
+      handleNext();
+    }
+  };
+
+  const handleImagesChange = (newImages: File[]) => {
+    setImages(newImages);
+  };
 
   return (
     <CustomThemeProvider>
@@ -249,7 +281,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
             
             {activeStep === 2 && (
               <StyledFlexColumn>
-                <StyledTypography variant="h6">
+                <StyledTypography variant="h6" align="center">
                   {t('whatWouldYouLikeToAdvertise')}
                 </StyledTypography>
                 <StyledButtonGroup>
@@ -268,6 +300,32 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
                     {t('item_advertisement_description')}
                   </StyledToggleButton>
                 </StyledButtonGroup>
+              </StyledFlexColumn>
+            )}
+            
+            {activeStep === 3 && (
+              <StyledFlexColumn>
+                <StyledTypography variant="h6" align="center">
+                  {t('uploadImages')}
+                </StyledTypography>
+                <ImageUpload 
+                  images={images}
+                  onChange={handleImagesChange}
+                  maxImages={5}
+                  language={language}
+                />
+              </StyledFlexColumn>
+            )}
+            
+            {activeStep === 4 && (
+              <StyledFlexColumn>
+                <AdvertisementForm
+                  type={advertiseType!}
+                  onSubmit={handleFormSubmit}
+                  language={language}
+                  // TODO: get categories from backend
+                  categories={[{ id: '1', name: 'Other' }]}
+                />
               </StyledFlexColumn>
             )}
           </div>
