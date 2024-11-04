@@ -26,12 +26,20 @@ const StyledImageContainer = styled('div')({
   aspectRatio: '1',
   borderRadius: '8px',
   overflow: 'hidden',
+  width: '100%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
 });
 
 const StyledImage = styled('img')({
   width: '100%',
   height: '100%',
   objectFit: 'cover',
+  position: 'absolute',
+  top: 0,
+  left: 0,
 });
 
 const StyledDeleteButton = styled(IconButton)({
@@ -71,19 +79,45 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = createTranslationFunction(language);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = event.target.files;
+    if (!fileList) return;
+
+    const files = Array.from(fileList);
+    
     if (files.length + images.length > maxImages) {
       WebApp.showAlert(
         t('maxImagesError').replace('{{max}}', maxImages.toString())
       );
       return;
     }
-    onChange([...images, ...files]);
+
+    // Validate that files are actually images
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (validFiles.length !== files.length) {
+      WebApp.showAlert(t('invalidImageFormat'));
+      return;
+    }
+
+    onChange([...images, ...validFiles]);
+
+    // Reset the input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
+
+  // Cleanup object URLs when component unmounts or images change
+  React.useEffect(() => {
+    return () => {
+      images.forEach(image => {
+        if (typeof image === 'object') {
+          URL.revokeObjectURL(URL.createObjectURL(image));
+        }
+      });
+    };
+  }, [images]);
 
   const handleDelete = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
@@ -94,10 +128,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
     <StyledUploadArea>
       <StyledImageGrid>
         {images.map((image, index) => (
-          <StyledImageContainer key={index}>
+          <StyledImageContainer key={`${index}-${image.name}`}>
             <StyledImage 
               src={URL.createObjectURL(image)} 
               alt={t('uploadImageAlt').replace('{{num}}', (index + 1).toString())} 
+              onError={(e) => {
+                console.error('Error loading image:', e);
+                WebApp.showAlert(t('imageLoadError'));
+              }}
             />
             <StyledDeleteButton 
               onClick={() => handleDelete(index)} 
