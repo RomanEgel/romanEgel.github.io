@@ -213,10 +213,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
               onChange={handleFileSelect}
               style={{ display: 'none' }}
               multiple
+              capture={undefined}
+              onClick={(event) => {
+                const element = event.target as HTMLInputElement;
+                element.value = '';
+              }}
             />
             <AddPhotoAlternateIcon sx={{ fontSize: 40, color: 'var(--hint-color)' }} />
             <Typography variant="caption" sx={{ color: 'var(--hint-color)' }}>
