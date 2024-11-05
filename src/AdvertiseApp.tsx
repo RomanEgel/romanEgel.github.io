@@ -146,12 +146,23 @@ interface AdvertiseAppProps {
   language: 'en' | 'ru';
 }
 
+const getDefaultCurrency = (language: 'en' | 'ru'): string => {
+  switch (language) {
+    case 'ru':
+      return 'RUB';
+    default:
+      return 'EUR';
+  }
+};
+
 const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [advertiseType, setAdvertiseType] = useState<AdvertiseType | null>(null);
   const [range, setRange] = useState<number>(5);
-  const [formData, setFormData] = useState<Partial<LocalsItem | LocalsService> | null>(null);
+  const [formData, setFormData] = useState<Partial<LocalsItem | LocalsService>>({
+    currency: getDefaultCurrency(language),
+  });
   const [images, setImages] = useState<File[]>([]);
   const t = createTranslationFunction(language);
 
@@ -194,19 +205,8 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
                         (activeStep === 3 && images.length === 0) ||
                         (activeStep === 4 && !formData);
 
-  const handleFormSubmit = (data: typeof formData) => {
-    setFormData(data);
-    if (activeStep === steps.length - 1) {
-      // Handle final submission
-      console.log('Final submission:', {
-        location,
-        range,
-        advertiseType,
-        formData: data
-      });
-    } else {
-      handleNext();
-    }
+  const handleFormStateChange = (name: string, value: string | number) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImagesChange = (newImages: File[]) => {
@@ -321,10 +321,14 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
               <StyledFlexColumn>
                 <AdvertisementForm
                   type={advertiseType!}
-                  onSubmit={handleFormSubmit}
                   language={language}
-                  // TODO: get categories from backend
-                  categories={[{ id: '1', name: 'Other' }]}
+                  formState={{
+                    title: formData.title ?? '',
+                    description: formData.description ?? '',
+                    price: formData.price?.toString() ?? '',
+                    currency: formData.currency ?? '',
+                  }}
+                  onFormStateChange={handleFormStateChange}
                 />
               </StyledFlexColumn>
             )}

@@ -9,15 +9,7 @@ import {
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { createTranslationFunction } from './utils';
-import { LocalsItem, LocalsService } from './types';
 
-const StyledForm = styled('form')({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '16px',
-  padding: '16px',
-});
 
 const StyledTextField = styled(TextField)({
   '& .MuiInputBase-input': {
@@ -62,46 +54,32 @@ const StyledFormControl = styled(FormControl)({
 
 interface AdvertisementFormProps {
   type: 'item' | 'service';
-  onSubmit: (data: Partial<LocalsItem | LocalsService>) => void;
   language: 'en' | 'ru';
-  categories: Array<{
-    id: string;
-    name: string;
-  }>;
+  formState: {
+    title: string;
+    description: string;
+    price: string;
+    currency: string;
+  };
+  onFormStateChange: (name: string, value: string | number) => void;
 }
-
-const getDefaultCurrency = (language: 'en' | 'ru'): string => {
-  switch (language) {
-    case 'ru':
-      return 'RUB';
-    case 'en':
-    default:
-      return 'USD';
-  }
-};
 
 const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
   type,
-  onSubmit,
   language,
-  categories,
+  formState,
+  onFormStateChange,
 }) => {
   const t = createTranslationFunction(language);
-  const [formState, setFormState] = React.useState({
+  const [errors, setErrors] = React.useState({
     title: '',
     description: '',
     price: '',
-    currency: getDefaultCurrency(language),
-    category: categories[0]?.id || '',
   });
-  
-  const [priceError, setPriceError] = React.useState<string>('');
-  const [titleError, setTitleError] = React.useState<string>('');
-  const [descriptionError, setDescriptionError] = React.useState<string>('');
 
   const MAX_TITLE_LENGTH = 50;
   const MAX_DESCRIPTION_LENGTH = 500;
-  
+
   const getMaxPrice = (currency: string) => {
     switch (currency) {
       case 'RUB':
@@ -113,96 +91,75 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
         return 1000;
     }
   };
+
+  const validatePrice = (value: string, currency = formState.currency) => {
+    const cleanValue = value.replace(/\D/g, '');
+    const numValue = parseInt(cleanValue, 10);
+    const maxPrice = getMaxPrice(currency!!);
+    
+    if (isNaN(numValue)) {
+      setErrors(prev => ({ ...prev, price: t('invalidPrice') }));
+      return false;
+    }
+    
+    if (numValue <= 0) {
+      setErrors(prev => ({ ...prev, price: t('priceMustBeGreaterThanZero') }));
+      return false;
+    }
+
+    if (numValue > maxPrice) {
+      setErrors(prev => ({
+        ...prev,
+        price: t('priceExceedsLimit')
+          .replace('{{max}}', maxPrice.toString())
+          .replace('{{currency}}', currency!!)
+      }));
+      return false;
+    }
+    
+    setErrors(prev => ({ ...prev, price: '' }));
+    return true;
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent) => {
     const { name, value } = e.target;
     
     if (name === 'currency') {
-      setFormState(prev => ({
-        ...prev,
-        currency: value,
-      }));
+      onFormStateChange(name, value);
       if (formState.price) {
         validatePrice(formState.price, value);
       }
     } else if (name === 'price') {
       if (value === '' || /^\d*$/.test(value)) {
-        setFormState(prev => ({
-          ...prev,
-          price: value,
-        }));
+        onFormStateChange(name, parseInt(value, 10));
       }
     } else if (name === 'title') {
       if (value.length <= MAX_TITLE_LENGTH) {
-        setFormState(prev => ({
-          ...prev,
-          title: value,
-        }));
-        setTitleError('');
+        onFormStateChange(name, value);
+        setErrors(prev => ({ ...prev, title: '' }));
       } else {
-        setTitleError(t('titleTooLong').replace('{{max}}', MAX_TITLE_LENGTH.toString()));
+        setErrors(prev => ({
+          ...prev,
+          title: t('titleTooLong').replace('{{max}}', MAX_TITLE_LENGTH.toString())
+        }));
       }
     } else if (name === 'description') {
       if (value.length <= MAX_DESCRIPTION_LENGTH) {
-        setFormState(prev => ({
-          ...prev,
-          description: value,
-        }));
-        setDescriptionError('');
+        onFormStateChange(name, value);
+        setErrors(prev => ({ ...prev, description: '' }));
       } else {
-        setDescriptionError(t('descriptionTooLong').replace('{{max}}', MAX_DESCRIPTION_LENGTH.toString()));
+        setErrors(prev => ({
+          ...prev,
+          description: t('descriptionTooLong').replace('{{max}}', MAX_DESCRIPTION_LENGTH.toString())
+        }));
       }
     } else {
-      setFormState(prev => ({
-        ...prev,
-        [name]: value,
-      }));
+      console.log("Unsupported field", name, value);
     }
-  };
-
-  const validatePrice = (value: string, currency = formState.currency) => {
-    const cleanValue = value.replace(/\D/g, '');
-    const numValue = parseInt(cleanValue, 10);
-    const maxPrice = getMaxPrice(currency);
-    
-    if (isNaN(numValue)) {
-      setPriceError(t('invalidPrice'));
-      return false;
-    }
-    
-    if (numValue <= 0) {
-      setPriceError(t('priceMustBeGreaterThanZero'));
-      return false;
-    }
-
-    if (numValue > maxPrice) {
-      setPriceError(t('priceExceedsLimit')
-        .replace('{{max}}', maxPrice.toString())
-        .replace('{{currency}}', currency)
-      );
-      return false;
-    }
-    
-    setFormState(prev => ({
-      ...prev,
-      price: numValue.toString(),
-    }));
-    setPriceError('');
-    return true;
   };
 
   const handlePriceBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     validatePrice(e.target.value);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (validatePrice(formState.price)) {
-      onSubmit({
-        ...formState,
-        price: parseFloat(formState.price),
-      });
-    }
   };
 
   const titleLabel = type === 'item' ? t('itemTitle') : t('serviceTitle');
@@ -210,15 +167,15 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
   const priceLabel = type === 'item' ? t('itemPrice') : t('servicePrice');
 
   return (
-    <StyledForm onSubmit={handleSubmit}>
+    <div className="flex flex-col gap-4 p-4 w-full">
       <StyledTextField
         required
         name="title"
         label={titleLabel}
         value={formState.title}
         onChange={handleInputChange}
-        error={!!titleError}
-        helperText={titleError || `${formState.title.length}/${MAX_TITLE_LENGTH}`}
+        error={!!errors.title}
+        helperText={errors.title || `${formState.title.length}/${MAX_TITLE_LENGTH}`}
         fullWidth
       />
       <StyledTextField
@@ -229,26 +186,10 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
         rows={4}
         value={formState.description}
         onChange={handleInputChange}
-        error={!!descriptionError}
-        helperText={descriptionError || `${formState.description.length}/${MAX_DESCRIPTION_LENGTH}`}
+        error={!!errors.description}
+        helperText={errors.description || `${formState.description.length}/${MAX_DESCRIPTION_LENGTH}`}
         fullWidth
       />
-      <StyledFormControl fullWidth>
-        <InputLabel>{t('category')}</InputLabel>
-        <Select
-          required
-          name="category"
-          value={formState.category}
-          onChange={handleInputChange}
-          label={t('category')}
-        >
-          {categories.map(category => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </StyledFormControl>
       <div className="flex gap-2">
         <StyledTextField
           required
@@ -257,8 +198,8 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
           value={formState.price}
           onChange={handleInputChange}
           onBlur={handlePriceBlur}
-          error={!!priceError}
-          helperText={priceError}
+          error={!!errors.price}
+          helperText={errors.price}
           fullWidth
         />
         <StyledFormControl fullWidth>
@@ -275,7 +216,7 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
           </Select>
         </StyledFormControl>
       </div>
-    </StyledForm>
+    </div>
   );
 };
 
