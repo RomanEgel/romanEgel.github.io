@@ -78,15 +78,7 @@ interface ImageUploadProps {
 
 const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, language }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageUrlsRef = useRef<string[]>([]);
   const t = createTranslationFunction(language);
-
-  // Clean up object URLs when component unmounts or images change
-  useEffect(() => {
-    return () => {
-      imageUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
-    };
-  }, []);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -129,9 +121,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
 
   const getImageUrl = (image: File) => {
     try {
-      const url = URL.createObjectURL(image);
-      imageUrlsRef.current.push(url);
-      return url;
+      return URL.createObjectURL(image);
     } catch (error) {
       console.error('Error creating object URL:', error);
       WebApp.showAlert(t('imageLoadError'));
@@ -140,11 +130,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
   };
 
   const handleDelete = (index: number) => {
-    // Revoke the URL of the deleted image
-    if (imageUrlsRef.current[index]) {
-      URL.revokeObjectURL(imageUrlsRef.current[index]);
-      imageUrlsRef.current = imageUrlsRef.current.filter((_, i) => i !== index);
-    }
     const newImages = images.filter((_, i) => i !== index);
     onChange(newImages);
   };
@@ -163,9 +148,6 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
                 alt={t('uploadImageAlt').replace('{{num}}', (index + 1).toString())} 
                 onError={(e) => {
                   console.error('Error loading image:', e);
-                  // Revoke the URL if image loading fails
-                  URL.revokeObjectURL(imageUrl);
-                  imageUrlsRef.current = imageUrlsRef.current.filter(url => url !== imageUrl);
                   WebApp.showAlert(t('imageLoadError'));
                 }}
               />

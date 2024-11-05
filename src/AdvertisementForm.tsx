@@ -61,6 +61,12 @@ interface AdvertisementFormProps {
     price: string;
     currency: string;
   };
+  errors: {
+    title: string;
+    description: string;
+    price: string;
+  };
+  onErrorChange: (name: string, value: string) => void;
   onFormStateChange: (name: string, value: string | number) => void;
 }
 
@@ -68,14 +74,11 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
   type,
   language,
   formState,
+  errors,
   onFormStateChange,
+  onErrorChange,
 }) => {
   const t = createTranslationFunction(language);
-  const [errors, setErrors] = React.useState({
-    title: '',
-    description: '',
-    price: '',
-  });
 
   const MAX_TITLE_LENGTH = 50;
   const MAX_DESCRIPTION_LENGTH = 500;
@@ -93,31 +96,34 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
   };
 
   const validatePrice = (value: string, currency = formState.currency) => {
+    if (!/^\d*$/.test(value)) {
+      onErrorChange('price', t('invalidPrice'));
+      return false;
+    }
+    
     const cleanValue = value.replace(/\D/g, '');
     const numValue = parseInt(cleanValue, 10);
     const maxPrice = getMaxPrice(currency!!);
     
     if (isNaN(numValue)) {
-      setErrors(prev => ({ ...prev, price: t('invalidPrice') }));
+      onErrorChange('price', t('invalidPrice'));
       return false;
     }
     
     if (numValue <= 0) {
-      setErrors(prev => ({ ...prev, price: t('priceMustBeGreaterThanZero') }));
+      onErrorChange('price', t('priceMustBeGreaterThanZero'));
       return false;
     }
 
     if (numValue > maxPrice) {
-      setErrors(prev => ({
-        ...prev,
-        price: t('priceExceedsLimit')
+      onErrorChange('price', t('priceExceedsLimit')
           .replace('{{max}}', maxPrice.toString())
           .replace('{{currency}}', currency!!)
-      }));
+      );
       return false;
     }
     
-    setErrors(prev => ({ ...prev, price: '' }));
+    onErrorChange('price', '');
     return true;
   };
   
@@ -125,33 +131,30 @@ const AdvertisementForm: React.FC<AdvertisementFormProps> = ({
     const { name, value } = e.target;
     
     if (name === 'currency') {
-      onFormStateChange(name, value);
       if (formState.price) {
-        validatePrice(formState.price, value);
+        if (validatePrice(formState.price, value)) {
+          onFormStateChange(name, value);
+        }
+      } else {
+        onFormStateChange(name, value);
       }
     } else if (name === 'price') {
-      if (value === '' || /^\d*$/.test(value)) {
+      if (validatePrice(value, formState.currency)) {
         onFormStateChange(name, parseInt(value, 10));
       }
     } else if (name === 'title') {
       if (value.length <= MAX_TITLE_LENGTH) {
         onFormStateChange(name, value);
-        setErrors(prev => ({ ...prev, title: '' }));
+        onErrorChange('title', '');
       } else {
-        setErrors(prev => ({
-          ...prev,
-          title: t('titleTooLong').replace('{{max}}', MAX_TITLE_LENGTH.toString())
-        }));
+        onErrorChange('title', t('titleTooLong').replace('{{max}}', MAX_TITLE_LENGTH.toString()));
       }
     } else if (name === 'description') {
       if (value.length <= MAX_DESCRIPTION_LENGTH) {
         onFormStateChange(name, value);
-        setErrors(prev => ({ ...prev, description: '' }));
+        onErrorChange('description', '');
       } else {
-        setErrors(prev => ({
-          ...prev,
-          description: t('descriptionTooLong').replace('{{max}}', MAX_DESCRIPTION_LENGTH.toString())
-        }));
+        onErrorChange('description', t('descriptionTooLong').replace('{{max}}', MAX_DESCRIPTION_LENGTH.toString()));
       }
     } else {
       console.log("Unsupported field", name, value);

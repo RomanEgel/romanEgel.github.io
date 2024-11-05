@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Typography, 
   Button, 
@@ -163,7 +163,17 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [formData, setFormData] = useState<Partial<LocalsItem | LocalsService>>({
     currency: getDefaultCurrency(language),
   });
+  const [formErrors, setFormErrors] = useState<{
+    title: string;
+    description: string;
+    price: string;
+  }>({
+    title: '',
+    description: '',
+    price: '',
+  });
   const [images, setImages] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const t = createTranslationFunction(language);
 
   const rangeMarks = [
@@ -198,20 +208,46 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
     t('uploadImages'),
     t('enterDetails')
   ];
+  const validateFormData = (): boolean => {
+    return Object.values(formErrors).every(error => error === '')
+      && Boolean(formData?.title) 
+      && Boolean(formData?.description)
+      && Boolean(formData?.price)
+      && Boolean(formData?.currency);
+  };
 
-  const isNextDisabled = (activeStep === 0 && !location) || 
+  const isNextDisabled = (activeStep === 0 && !location) ||
                         (activeStep === 1 && !range) ||
                         (activeStep === 2 && !advertiseType) ||
                         (activeStep === 3 && images.length === 0) ||
-                        (activeStep === 4 && !formData);
+                        (activeStep === 4 && !validateFormData());
+
 
   const handleFormStateChange = (name: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImagesChange = (newImages: File[]) => {
-    setImages(newImages);
+  const handleErrorChange = (name: string, value: string) => {
+    setFormErrors(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleImagesChange = (newImages: File[]) => {
+    // Cleanup old URLs
+    imageUrls.forEach(url => URL.revokeObjectURL(url));
+    
+    // Create new URLs
+    const newUrls = newImages.map(image => URL.createObjectURL(image));
+    
+    setImages(newImages);
+    setImageUrls(newUrls);
+  };
+
+  useEffect(() => {
+    return () => {
+      // Cleanup all image URLs when component unmounts
+      imageUrls.forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [imageUrls]);
 
   return (
     <CustomThemeProvider>
@@ -328,6 +364,8 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
                     price: formData.price?.toString() ?? '',
                     currency: formData.currency ?? '',
                   }}
+                  errors={formErrors}
+                  onErrorChange={handleErrorChange}
                   onFormStateChange={handleFormStateChange}
                 />
               </StyledFlexColumn>
