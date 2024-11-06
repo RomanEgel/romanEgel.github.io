@@ -47,17 +47,6 @@ const calculateDistance = (
   return Math.round(distance * 100) / 100;
 };
 
-const isLocationNearAnyCommunity = (
-  lat: number,
-  lng: number,
-  communities: Array<{lat: number; lng: number}>,
-  maxDistance: number
-): boolean => {
-  return communities.some(community => 
-    calculateDistance(lat, lng, community.lat, community.lng) <= maxDistance
-  );
-};
-
 const getCommunitiesInRange = (
   lat: number,
   lng: number,

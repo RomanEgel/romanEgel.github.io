@@ -121,7 +121,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, langu
 
   useEffect(() => {
     if (map && pins.length > 0 && window.google) {
-      const markers = pins.map((pin, index) => {
+      const markers = pins.map((pin, _) => {
         const pinElement = document.createElement('div');
         pinElement.style.width = `${getIconSize(zoom).scaledSize.width}px`;
         pinElement.style.height = `${getIconSize(zoom).scaledSize.height}px`;
