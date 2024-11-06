@@ -98,6 +98,9 @@ export const translations = {
     addImage: 'Add Image',
     invalidImageFormat: 'Please select valid image files only',
     imageLoadError: 'Failed to load image',
+    localsOnlyCommunity: 'Locals Only Community',
+    locationTooFarFromCommunities: 'Selected location is too far from any community. Please select a location within {{range}}km of a community.',
+    noCommunitiesInRange: 'No communities found within selected range. Please increase the range to include at least one community.',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -196,6 +199,9 @@ export const translations = {
     addImage: 'Добавить изображение',
     invalidImageFormat: 'Пожалуйста, выберите только файлы изображений',
     imageLoadError: 'Не удалось загрузить изображение',
+    localsOnlyCommunity: 'Сооб��ество Locals Only',
+    locationTooFarFromCommunities: 'Выбранное местоположение находится слишком далеко от сообществ. Пожалуйста, выберите местоположение в пределах {{range}} км от сообщества.',
+    noCommunitiesInRange: 'В выбранном радиусе не найдено сообществ. Пожалуйста, увеличьте радиус, чтобы покрыть хотя бы одно сообщество.',
   },
 } as const;
 

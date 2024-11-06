@@ -17,6 +17,57 @@ import GoogleMapsProvider from './GoogleMapsProvider';
 import AdvertisementForm from './AdvertisementForm';
 import { LocalsItem, LocalsService } from './types';
 import ImageUpload from './ImageUpload';
+import { useAuth } from './AuthContext';
+import { fetchCommunityCoordinates } from './apiService';
+
+const calculateDistance = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+): number => {
+  // Validate coordinates
+  if (Math.abs(lat1) > 90 || Math.abs(lat2) > 90 || 
+      Math.abs(lon1) > 180 || Math.abs(lon2) > 180) {
+    console.error('Invalid coordinates detected:', { lat1, lon1, lat2, lon2 });
+    return Infinity;
+  }
+
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c;
+  
+  // Round to 2 decimal places to avoid floating point issues
+  return Math.round(distance * 100) / 100;
+};
+
+const isLocationNearAnyCommunity = (
+  lat: number,
+  lng: number,
+  communities: Array<{lat: number; lng: number}>,
+  maxDistance: number
+): boolean => {
+  return communities.some(community => 
+    calculateDistance(lat, lng, community.lat, community.lng) <= maxDistance
+  );
+};
+
+const getCommunitiesInRange = (
+  lat: number,
+  lng: number,
+  communities: Array<{lat: number; lng: number}>,
+  range: number
+): Array<{lat: number; lng: number}> => {
+  return communities.filter(community => 
+    calculateDistance(lat, lng, community.lat, community.lng) <= range
+  );
+};
 
 const StyledMap = styled('div')({
   width: '100%',
@@ -159,7 +210,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [advertiseType, setAdvertiseType] = useState<AdvertiseType | null>(null);
-  const [range, setRange] = useState<number>(5);
+  const [range, setRange] = useState<number>(100);
   const [formData, setFormData] = useState<Partial<LocalsItem | LocalsService>>({
     currency: getDefaultCurrency(language),
   });
@@ -175,6 +226,10 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [images, setImages] = useState<File[]>([]);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const t = createTranslationFunction(language);
+  const { authorization } = useAuth();
+  const [communityPins, setCommunityPins] = useState<Array<{lat: number; lng: number}>>([]);
+  const [communitiesInRange, setCommunitiesInRange] = useState<Array<{lat: number; lng: number}>>([]);
+  const [locationError, setLocationError] = useState<string>('');
 
   const rangeMarks = [
     { value: 5, label: '5' },
@@ -217,7 +272,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   };
 
   const isNextDisabled = (activeStep === 0 && !location) ||
-                        (activeStep === 1 && !range) ||
+                        (activeStep === 1 && (!range || communitiesInRange.length === 0)) ||
                         (activeStep === 2 && !advertiseType) ||
                         (activeStep === 3 && images.length === 0) ||
                         (activeStep === 4 && !validateFormData());
@@ -243,11 +298,55 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   };
 
   useEffect(() => {
+    const loadCommunityCoordinates = async () => {
+      if (!authorization) return;
+      
+      try {
+        const coordinates = await fetchCommunityCoordinates(authorization);
+        setCommunityPins(coordinates);
+      } catch (error) {
+        console.error('Error fetching community coordinates:', error);
+      }
+    };
+
+    loadCommunityCoordinates();
+  }, [authorization]);
+
+  useEffect(() => {
     return () => {
       // Cleanup all image URLs when component unmounts
       imageUrls.forEach(url => URL.revokeObjectURL(url));
     };
   }, [imageUrls]);
+
+  useEffect(() => {
+    if (location && communityPins.length > 0) {
+      // Log distances to all communities for debugging
+      communityPins.forEach(pin => {
+        const distance = calculateDistance(
+          location.lat,
+          location.lng,
+          pin.lat,
+          pin.lng
+        );
+        console.log(`Distance to community at (${pin.lat}, ${pin.lng}): ${distance.toFixed(2)} km`);
+      });
+
+      const communities = getCommunitiesInRange(
+        location.lat,
+        location.lng,
+        communityPins,
+        range
+      );
+      console.log(`Found ${communities.length} communities within ${range} km`);
+      setCommunitiesInRange(communities);
+      if (communities.length === 0) {
+        setLocationError(t('locationTooFarFromCommunities').replace('{{range}}', range.toString()));
+      } else {
+        setLocationError('');
+      }
+    }
+  }, [location, range, communityPins]);
 
   return (
     <CustomThemeProvider>
@@ -268,14 +367,31 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
 
           <div className="flex flex-col">
             {activeStep === 0 && (
-              <StyledMap>
-                <GoogleMapsProvider language={language}>
-                  <LocationPicker
-                    onLocationSelect={handleLocationSelect}
-                    language={language}
-                  />
-                </GoogleMapsProvider>
-              </StyledMap>
+              <>
+                {locationError && (
+                  <StyledTypography 
+                    variant="body2" 
+                    align="center" 
+                    sx={{ 
+                      color: 'error.main',
+                      marginTop: '16px',
+                      marginBottom: '-8px'
+                    }}
+                  >
+                    {locationError}
+                  </StyledTypography>
+                )}
+                <StyledMap>
+                  <GoogleMapsProvider language={language}>
+                    <LocationPicker
+                      location={location}
+                      onLocationSelect={handleLocationSelect}
+                      language={language}
+                      pins={communityPins}
+                    />
+                  </GoogleMapsProvider>
+                </StyledMap>
+              </>
             )}
             
             {activeStep === 1 && (
@@ -312,6 +428,15 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
                 <StyledTypography variant="body1" align="center">
                   {t('rangeDescription').replace('{{range}}', range.toString())}
                 </StyledTypography>
+                {communitiesInRange.length === 0 && (
+                  <StyledTypography 
+                    variant="body2" 
+                    align="center" 
+                    sx={{ color: 'error.main' }}
+                  >
+                    {t('noCommunitiesInRange')}
+                  </StyledTypography>
+                )}
               </StyledSliderContainer>
             )}
             

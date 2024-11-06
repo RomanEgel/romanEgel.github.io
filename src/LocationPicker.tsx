@@ -1,11 +1,18 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GoogleMap, Marker } from '@react-google-maps/api';
+import { GoogleMap } from '@react-google-maps/api';
 import { Box, Typography, styled } from '@mui/material';
 import { createTranslationFunction } from './utils';
 
+interface MapPin {
+  lat: number;
+  lng: number;
+}
+
 interface LocationPickerProps {
+  location: { lat: number; lng: number } | null;
   onLocationSelect: (lat: number, lng: number) => void;
   language: 'en' | 'ru';
+  pins?: MapPin[];
 }
 
 const mapContainerStyle = {
@@ -13,14 +20,13 @@ const mapContainerStyle = {
   height: '300px'
 };
 
-
 const StyledBox = styled(Box)({
   backgroundColor: 'var(--bg-color)',
   padding: '16px',
   borderRadius: '8px',
 });
 
-const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, language }) => {
+const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, language, pins = [], location }) => {
   const [selectedLocation, setSelectedLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [center, setCenter] = useState<google.maps.LatLngLiteral>({ lat: 0, lng: 0 });
@@ -42,7 +48,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, langu
   };
 
   useEffect(() => {
-    fetchUserLocation();
+    if (!selectedLocation) {
+      fetchUserLocation();
+    }
   }, []);
 
   const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
@@ -61,11 +69,80 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, langu
   }, []);
 
   useEffect(() => {
+    if (location) {
+      setSelectedLocation({ lat: location.lat, lng: location.lng });
+      if (map) {
+        map.panTo({ lat: location.lat, lng: location.lng });
+        map.setZoom(14);
+      }
+    } else {
+      setSelectedLocation(null);
+    }
+  }, [location, map]);
+
+  const getIconSize = (zoomLevel: number) => {
+    const baseSize = 32;
+    const scaleFactor = 1.2;
+    
+    const size = Math.max(16, Math.min(48, baseSize * Math.pow(scaleFactor, zoomLevel - 14)));
+    
+    return {
+      url: '/icon.png',
+      scaledSize: new google.maps.Size(size, size),
+      anchor: new google.maps.Point(size/2, size/2),
+    };
+  };
+
+  const handleZoomChanged = () => {
+    if (map) {
+      const newZoom = map.getZoom();
+      if (newZoom) {
+        setZoom(newZoom);
+      }
+    }
+  };
+
+  useEffect(() => {
     if (map && selectedLocation) {
-      map.panTo(selectedLocation);
-      map.setZoom(14);
+      // Clear existing markers
+      if (window.google) {
+        const marker = new google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: selectedLocation,
+          title: 'Selected Location'
+        });
+
+        return () => {
+          marker.map = null;
+        };
+      }
     }
   }, [map, selectedLocation]);
+
+  useEffect(() => {
+    if (map && pins.length > 0 && window.google) {
+      const markers = pins.map((pin, index) => {
+        const pinElement = document.createElement('div');
+        pinElement.style.width = `${getIconSize(zoom).scaledSize.width}px`;
+        pinElement.style.height = `${getIconSize(zoom).scaledSize.height}px`;
+        pinElement.style.backgroundImage = `url(${getIconSize(zoom).url})`;
+        pinElement.style.backgroundSize = 'contain';
+
+        return new google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: { lat: pin.lat, lng: pin.lng },
+          title: t('localsOnlyCommunity'),
+          content: pinElement
+        });
+      });
+
+      return () => {
+        markers.forEach(marker => {
+          marker.map = null;
+        });
+      };
+    }
+  }, [map, pins, zoom]);
 
   return (
     <StyledBox>
@@ -76,8 +153,12 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, langu
         zoom={zoom}
         onClick={handleMapClick}
         onLoad={onMapLoad}
+        onZoomChanged={handleZoomChanged}
+        options={{
+          mapId: import.meta.env.VITE_GOOGLE_MAPS_ID as string
+        }}
       >
-        {selectedLocation && <Marker position={selectedLocation} />}
+        {/* Remove the MarkerF components - markers are now handled in useEffect */}
       </GoogleMap>
       <Box sx={{ mt: 2, mb: 2 }}>
         {selectedLocation ? (

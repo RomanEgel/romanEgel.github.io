@@ -193,3 +193,20 @@ export const saveSetupData = async (setupData: SetupData, authorization: string,
     throw new Error('Failed to save setup data');
   }
 };
+
+interface CommunityCoordinates {
+  lat: number;
+  lng: number;
+}
+
+export const fetchCommunityCoordinates = async (authorization: string): Promise<CommunityCoordinates[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/communities/coordinates`, {
+    headers: {
+      Authorization: `tma ${authorization}`
+    }
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch community coordinates');
+  }
+  return (await response.json())['coordinates'];
+};
