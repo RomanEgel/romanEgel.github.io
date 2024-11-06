@@ -224,6 +224,7 @@ const SetupApp: React.FC<SetupAppProps> = ({ onSetupComplete, community }) => {
                   <StyledMap>
                     <GoogleMapsProvider language={language}>
                       <LocationPicker
+                        location={selectedLocation}
                         onLocationSelect={handleLocationSelect}
                         language={language}
                       />
