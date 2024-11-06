@@ -48,7 +48,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onLocationSelect, langu
   };
 
   useEffect(() => {
-    if (!selectedLocation) {
+    if (!location && !selectedLocation) {
       fetchUserLocation();
     }
   }, []);
