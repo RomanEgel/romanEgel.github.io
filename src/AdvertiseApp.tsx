@@ -236,11 +236,26 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
           console.log('Media group created:', mediaGroupData);
           const mediaGroupId = mediaGroupData.mediaGroupId;
           const uploadLinks = mediaGroupData.uploadLinks;
-          for (let i = 0; i < uploadLinks.length; i++) {
-            uploadImageToGCS(uploadLinks[i], images[i]);
-          }
 
-          createAdvertisement(mediaGroupId, formData.title!!, formData.description!!, formData.price!!, formData.currency!!, advertiseType!!, location!!, range, authorization)
+          const uploadPromises = uploadLinks.map((link: string, index: number) => 
+            uploadImageToGCS(link, images[index])
+          );
+
+          Promise.all(uploadPromises)
+            .then(() => {
+              console.log('All images uploaded successfully');
+              return createAdvertisement(
+                mediaGroupId, 
+                formData.title!!, 
+                formData.description!!, 
+                formData.price!!, 
+                formData.currency!!, 
+                advertiseType!!, 
+                location!!, 
+                range, 
+                authorization
+              );
+            })
             .then(response => {
               if (response.status === 200) {
                 console.log('Advertisement created:', response);
@@ -249,10 +264,15 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
                 console.log('Advertisement creation failed:', response);
                 WebApp.showAlert(t('advertisementCreationFailed'));
               }
-            }).catch(error => {
-              console.error('Error creating advertisement:', error);
+            })
+            .catch(error => {
+              console.error('Error during upload or advertisement creation:', error);
               WebApp.showAlert(t('advertisementCreationFailed'));
             });
+        })
+        .catch(error => {
+          console.error('Error creating media group:', error);
+          WebApp.showAlert(t('advertisementCreationFailed'));
         });
     } else {
       setActiveStep((prevStep) => prevStep + 1);
