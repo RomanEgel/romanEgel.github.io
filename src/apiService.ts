@@ -211,7 +211,19 @@ export const fetchCommunityCoordinates = async (authorization: string): Promise<
   return (await response.json())['coordinates'];
 };
 
-export const createAdvertisement = async (title: string, description: string, price: number, currency: string, entityType: 'item' | 'service', location: {lat: number, lng: number}, range: number, authorization: string) => {
+export const createMediaGroup = async (images: string[], authorization: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/media-groups`, {
+    method: 'POST',
+    headers: {
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ images }),
+  });
+  return response.json();
+};
+
+export const createAdvertisement = async (mediaGroupId: string, title: string, description: string, price: number, currency: string, entityType: 'item' | 'service', location: {lat: number, lng: number}, range: number, authorization: string) => {
   const response = await fetch(`${API_BASE_URL}/api/advertisements`, {
     method: 'POST',
     headers: {
@@ -225,7 +237,8 @@ export const createAdvertisement = async (title: string, description: string, pr
       currency,
       entityType,
       location,
-      range
+      range,
+      mediaGroupId
     })
   });
   return response;

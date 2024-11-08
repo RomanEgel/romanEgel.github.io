@@ -12,13 +12,13 @@ import {
 } from '@mui/material';
 import { CustomThemeProvider } from './CustomThemeProvider';
 import LocationPicker from './LocationPicker';
-import { createTranslationFunction } from './utils';
+import { createTranslationFunction, uploadImageToGCS } from './utils';
 import GoogleMapsProvider from './GoogleMapsProvider';
 import AdvertisementForm from './AdvertisementForm';
 import { LocalsItem, LocalsService } from './types';
 import ImageUpload from './ImageUpload';
 import { useAuth } from './AuthContext';
-import { createAdvertisement, fetchCommunityCoordinates } from './apiService';
+import { createAdvertisement, createMediaGroup, fetchCommunityCoordinates } from './apiService';
 import WebApp from '@twa-dev/sdk';
 
 const calculateDistance = (
@@ -231,18 +231,28 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
-      createAdvertisement(formData.title!!, formData.description!!, formData.price!!, formData.currency!!, advertiseType!!, location!!, range, authorization)
-        .then(response => {
-          if (response.status === 200) {
-            console.log('Advertisement created:', response);
-            WebApp.showConfirm(t('advertisementCreated'), () => WebApp.close());
-          } else {
-            console.log('Advertisement creation failed:', response);
-            WebApp.showAlert(t('advertisementCreationFailed'));
+      createMediaGroup(images.map(image => image.name), authorization)
+        .then(mediaGroupData => {
+          console.log('Media group created:', mediaGroupData);
+          const mediaGroupId = mediaGroupData.mediaGroupId;
+          const uploadLinks = mediaGroupData.uploadLinks;
+          for (let i = 0; i < uploadLinks.length; i++) {
+            uploadImageToGCS(uploadLinks[i], images[i]);
           }
-        }).catch(error => {
-          console.error('Error creating advertisement:', error);
-          WebApp.showAlert(t('advertisementCreationFailed'));
+
+          createAdvertisement(mediaGroupId, formData.title!!, formData.description!!, formData.price!!, formData.currency!!, advertiseType!!, location!!, range, authorization)
+            .then(response => {
+              if (response.status === 200) {
+                console.log('Advertisement created:', response);
+                WebApp.showConfirm(t('advertisementCreated'), () => WebApp.close());
+              } else {
+                console.log('Advertisement creation failed:', response);
+                WebApp.showAlert(t('advertisementCreationFailed'));
+              }
+            }).catch(error => {
+              console.error('Error creating advertisement:', error);
+              WebApp.showAlert(t('advertisementCreationFailed'));
+            });
         });
     } else {
       setActiveStep((prevStep) => prevStep + 1);

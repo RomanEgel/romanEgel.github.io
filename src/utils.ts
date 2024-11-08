@@ -46,3 +46,20 @@ export const showConfirm = (message: string, callback: (result: boolean) => void
     });
   }
 };
+
+export const uploadImageToGCS = async (link: string, image: File): Promise<boolean> => {
+  try {
+    const response = await fetch(link, {
+      method: 'PUT',
+      body: image,
+      headers: {
+        'Content-Type': 'image/jpg',
+      },
+    });
+    
+    return response.ok;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    return false;
+  }
+};
