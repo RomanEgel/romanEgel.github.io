@@ -210,3 +210,23 @@ export const fetchCommunityCoordinates = async (authorization: string): Promise<
   }
   return (await response.json())['coordinates'];
 };
+
+export const createAdvertisement = async (title: string, description: string, price: number, currency: string, entityType: 'item' | 'service', location: {lat: number, lng: number}, range: number, authorization: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/advertisements`, {
+    method: 'POST',
+    headers: {
+      Authorization: `tma ${authorization}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      title,
+      description,
+      price,
+      currency,
+      entityType,
+      location,
+      range
+    })
+  });
+  return response;
+};

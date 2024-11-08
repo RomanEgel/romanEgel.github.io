@@ -18,7 +18,8 @@ import AdvertisementForm from './AdvertisementForm';
 import { LocalsItem, LocalsService } from './types';
 import ImageUpload from './ImageUpload';
 import { useAuth } from './AuthContext';
-import { fetchCommunityCoordinates } from './apiService';
+import { createAdvertisement, fetchCommunityCoordinates } from './apiService';
+import WebApp from '@twa-dev/sdk';
 
 const calculateDistance = (
   lat1: number,
@@ -229,7 +230,23 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   ];
 
   const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
+    if (activeStep === steps.length - 1) {
+      createAdvertisement(formData.title!!, formData.description!!, formData.price!!, formData.currency!!, advertiseType!!, location!!, range, authorization)
+        .then(response => {
+          if (response.status === 200) {
+            console.log('Advertisement created:', response);
+            WebApp.showConfirm(t('advertisementCreated'), () => WebApp.close());
+          } else {
+            console.log('Advertisement creation failed:', response);
+            WebApp.showAlert(t('advertisementCreationFailed'));
+          }
+        }).catch(error => {
+          console.error('Error creating advertisement:', error);
+          WebApp.showAlert(t('advertisementCreationFailed'));
+        });
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
+    }
   };
 
   const handleBack = () => {
