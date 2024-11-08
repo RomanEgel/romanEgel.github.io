@@ -48,12 +48,14 @@ export const showConfirm = (message: string, callback: (result: boolean) => void
 };
 
 export const uploadImageToGCS = async (link: string, image: File): Promise<boolean> => {
+
+  const contentType = image.type;
   try {
     const response = await fetch(link, {
       method: 'PUT',
       body: image,
       headers: {
-        'Content-Type': 'image/jpg',
+        'Content-Type': contentType,
       },
     });
     

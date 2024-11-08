@@ -211,7 +211,7 @@ export const fetchCommunityCoordinates = async (authorization: string): Promise<
   return (await response.json())['coordinates'];
 };
 
-export const createMediaGroup = async (images: string[], authorization: string) => {
+export const createMediaGroup = async (images: {name: string, contentType: string}[], authorization: string) => {
   const response = await fetch(`${API_BASE_URL}/api/media-groups`, {
     method: 'POST',
     headers: {

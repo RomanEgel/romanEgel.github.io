@@ -231,7 +231,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
-      createMediaGroup(images.map(image => image.name), authorization)
+      createMediaGroup(images.map(image => ({name: image.name, contentType: image.type})), authorization)
         .then(mediaGroupData => {
           console.log('Media group created:', mediaGroupData);
           const mediaGroupId = mediaGroupData.mediaGroupId;
