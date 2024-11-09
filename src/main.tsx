@@ -13,7 +13,7 @@ import { AuthProvider } from './AuthContext';
 import { createAppStyles } from './AppStyles';
 import CommunitiesPicker from './CommunitiesPicker.tsx';
 import { LocalsCommunity } from './types.ts';
-import AdvertiseApp from './AdvertiseApp';
+import AdvertiseApp from './advertisement/AdvertiseApp.tsx';
 
 let initDataRawToUse: string;
 let themeParams: ThemeParams;

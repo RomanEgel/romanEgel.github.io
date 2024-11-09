@@ -243,3 +243,23 @@ export const createAdvertisement = async (mediaGroupId: string, title: string, d
   });
   return response;
 };
+
+export const getAdvertisements = async (authorization: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/advertisements`, {
+    headers: { Authorization: `tma ${authorization}` }
+  });
+  return response.json();
+};
+
+export const deleteAdvertisement = async (adId: string, authorization: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/advertisements/${adId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `tma ${authorization}`,
+    },
+  });
+  
+  if (!response.ok) {
+    throw new Error('Failed to delete advertisement');
+  }
+};

@@ -8,7 +8,7 @@ import {
   FormControl,
 } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import { createTranslationFunction } from './utils';
+import { createTranslationFunction } from '../utils';
 
 
 const StyledTextField = styled(TextField)({

@@ -11,15 +11,15 @@ import {
   Slider,
   CircularProgress
 } from '@mui/material';
-import { CustomThemeProvider } from './CustomThemeProvider';
-import LocationPicker from './LocationPicker';
-import { createTranslationFunction, uploadImageToGCS } from './utils';
-import GoogleMapsProvider from './GoogleMapsProvider';
+import { CustomThemeProvider } from '../CustomThemeProvider';
+import LocationPicker from '../LocationPicker';
+import { createTranslationFunction, uploadImageToGCS } from '../utils';
+import GoogleMapsProvider from '../GoogleMapsProvider';
 import AdvertisementForm from './AdvertisementForm';
-import { LocalsItem, LocalsService } from './types';
-import ImageUpload from './ImageUpload';
-import { useAuth } from './AuthContext';
-import { createAdvertisement, createMediaGroup, fetchCommunityCoordinates } from './apiService';
+import { LocalsItem, LocalsService } from '../types';
+import ImageUpload from '../ImageUpload';
+import { useAuth } from '../AuthContext';
+import { createAdvertisement, createMediaGroup, fetchCommunityCoordinates } from '../apiService';
 import WebApp from '@twa-dev/sdk';
 
 const calculateDistance = (
@@ -184,8 +184,9 @@ const StyledSliderContainer = styled('div')({
 
 type AdvertiseType = 'service' | 'item';
 
-interface AdvertiseAppProps {
+interface AdvertiseSetupProps {
   language: 'en' | 'ru';
+  onBack: () => void;
 }
 
 const getDefaultCurrency = (language: 'en' | 'ru'): string => {
@@ -197,7 +198,7 @@ const getDefaultCurrency = (language: 'en' | 'ru'): string => {
   }
 };
 
-const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
+const AdvertiseSetup: React.FC<AdvertiseSetupProps> = ({ language, onBack }) => {
   const [activeStep, setActiveStep] = useState(0);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [advertiseType, setAdvertiseType] = useState<AdvertiseType | null>(null);
@@ -286,7 +287,11 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   };
 
   const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
+    if (activeStep > 0) {
+      setActiveStep((prevStep) => prevStep - 1);
+    } else {
+      onBack();
+    }
   };
 
   const handleLocationSelect = (lat: number, lng: number) => {
@@ -540,11 +545,11 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
           </div>
 
           <StyledFlexRow>
-            {activeStep > 0 && (
+            {
               <StyledButton onClick={handleBack} sx={{ mr: 1 }}>
                 {t('back')}
               </StyledButton>
-            )}
+            }
             <StyledSpacer />
             <StyledButton 
               onClick={handleNext}
@@ -560,4 +565,4 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   );
 };
 
-export default AdvertiseApp; 
+export default AdvertiseSetup; 

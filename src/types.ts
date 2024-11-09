@@ -50,3 +50,14 @@ export interface LocalsUser {
   username: string;
   notifications_enabled: boolean;
 }
+
+export interface Advertisement {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  currency: string;
+  entityType: string;
+  views: number;
+  images: string[];
+}

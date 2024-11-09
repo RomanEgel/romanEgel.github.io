@@ -104,6 +104,10 @@ export const translations = {
     advertisementCreated: 'Advertisement successfully created',
     advertisementCreationFailed: 'Failed to create advertisement',
     creating: 'Creating...',
+    yourAdvertisements: 'Your Advertisements',
+    noAdvertisementsYet: 'You have no advertisements yet',
+    advertisementDetails: 'Advertisement Details',
+    confirmDeleteAdvertisement: 'Are you sure you want to delete this advertisement?',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -208,6 +212,9 @@ export const translations = {
     advertisementCreated: 'Объявление успешно создано',
     advertisementCreationFailed: 'Не удалось создать объявление',
     creating: 'Создание...',
+    yourAdvertisements: 'Ваши объявления',
+    noAdvertisementsYet: 'У Вас пока нет объявлений',
+    confirmDeleteAdvertisement: 'Вы уверены, что хотите удалить это объявление?',
   },
 } as const;
 
