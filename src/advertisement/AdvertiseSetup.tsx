@@ -17,7 +17,7 @@ import { createTranslationFunction, uploadImageToGCS } from '../utils';
 import GoogleMapsProvider from '../GoogleMapsProvider';
 import AdvertisementForm from './AdvertisementForm';
 import { LocalsItem, LocalsService } from '../types';
-import ImageUpload from '../ImageUpload';
+import ImageUpload from './ImageUpload';
 import { useAuth } from '../AuthContext';
 import { createAdvertisement, createMediaGroup, fetchCommunityCoordinates } from '../apiService';
 import WebApp from '@twa-dev/sdk';

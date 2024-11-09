@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Typography, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { createTranslationFunction } from './utils';
+import { createTranslationFunction } from '../utils';
 import WebApp from '@twa-dev/sdk';
 
 const StyledUploadArea = styled('div')({
@@ -30,6 +30,13 @@ const StyledImageContainer = styled('div')({
   overflow: 'hidden',
   width: '100%',
   height: 'auto',
+  cursor: 'move',
+  '&.dragging': {
+    opacity: 0.5,
+  },
+  '&.primary': {
+    border: '2px solid var(--button-color)',
+  },
 });
 
 const StyledImage = styled('img')({
@@ -69,6 +76,33 @@ const StyledUploadButton = styled('label')({
   },
 });
 
+const StyledDropIndicator = styled('div')({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: 'var(--button-color)',
+  opacity: 0,
+  transition: 'opacity 0.2s',
+  pointerEvents: 'none',
+  '&.show': {
+    opacity: 0.3,
+  },
+});
+
+const StyledBadge = styled('div')({
+  position: 'absolute',
+  top: '4px',
+  left: '4px',
+  backgroundColor: 'var(--button-color)',
+  color: 'white',
+  padding: '2px 8px',
+  borderRadius: '4px',
+  fontSize: '12px',
+  zIndex: 1,
+});
+
 interface ImageUploadProps {
   images: File[];
   onChange: (images: File[]) => void;
@@ -79,6 +113,7 @@ interface ImageUploadProps {
 const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, language }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = createTranslationFunction(language);
+  const [dragTarget, setDragTarget] = useState<number | null>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -134,6 +169,34 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
     onChange(newImages);
   };
 
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    setDragTarget(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDragTarget(index);
+  };
+
+  const handleDragLeave = () => {
+    setDragTarget(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    setDragTarget(null);
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) return;
+
+    const newImages = [...images];
+    const draggedImage = newImages[dragIndex];
+    newImages.splice(dragIndex, 1);
+    newImages.splice(dropIndex, 0, draggedImage);
+    onChange(newImages);
+  };
+
   return (
     <StyledUploadArea>
       <StyledImageGrid>
@@ -142,7 +205,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
           if (!imageUrl) return null;
 
           return (
-            <StyledImageContainer key={`${index}-${image.name}`}>
+            <StyledImageContainer 
+              key={`${index}-${image.name}`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, index)}
+              className={index === 0 ? 'primary' : ''}
+            >
+              {index === 0 && (
+                <StyledBadge>{t('primary')}</StyledBadge>
+              )}
               <StyledImage 
                 src={imageUrl}
                 alt={t('uploadImageAlt').replace('{{num}}', (index + 1).toString())} 
@@ -151,6 +225,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
                   WebApp.showAlert(t('imageLoadError'));
                 }}
               />
+              <StyledDropIndicator className={dragTarget === index ? 'show' : ''} />
               <StyledDeleteButton 
                 onClick={() => handleDelete(index)} 
                 size="small"

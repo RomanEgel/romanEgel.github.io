@@ -108,6 +108,7 @@ export const translations = {
     noAdvertisementsYet: 'You have no advertisements yet',
     advertisementDetails: 'Advertisement Details',
     confirmDeleteAdvertisement: 'Are you sure you want to delete this advertisement?',
+    primary: 'Primary',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -216,6 +217,7 @@ export const translations = {
     noAdvertisementsYet: 'У Вас пока нет объявлений',
     advertisementDetails: 'Детали объявления',
     confirmDeleteAdvertisement: 'Вы уверены, что хотите удалить это объявление?',
+    primary: 'Основное',
   },
 } as const;
 
