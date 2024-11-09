@@ -369,7 +369,6 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-4">
             <p className="text-center app-hint mb-4">{(() => {
-              const entitySettings = community.entitySettings;
               switch (activeTab) {
                 case 'events': return t('noEventsFound');
                 case 'items': return t('noItemsFound');
