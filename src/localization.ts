@@ -103,6 +103,7 @@ export const translations = {
     noCommunitiesInRange: 'No communities found within selected range. Please increase the range to include at least one community.',
     advertisementCreated: 'Advertisement successfully created',
     advertisementCreationFailed: 'Failed to create advertisement',
+    creating: 'Creating...',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -206,6 +207,7 @@ export const translations = {
     noCommunitiesInRange: 'В выбранном радиусе не найдено сообществ. Пожалуйста, увеличьте радиус, чтобы покрыть хотя бы одно сообщество.',
     advertisementCreated: 'Объявление успешно создано',
     advertisementCreationFailed: 'Не удалось создать объявление',
+    creating: 'Создание...',
   },
 } as const;
 

@@ -8,7 +8,8 @@ import {
   styled,
   StepConnector,
   stepConnectorClasses,
-  Slider
+  Slider,
+  CircularProgress
 } from '@mui/material';
 import { CustomThemeProvider } from './CustomThemeProvider';
 import LocationPicker from './LocationPicker';
@@ -220,6 +221,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   const [communityPins, setCommunityPins] = useState<Array<{lat: number; lng: number}>>([]);
   const [communitiesInRange, setCommunitiesInRange] = useState<Array<{lat: number; lng: number}>>([]);
   const [locationError, setLocationError] = useState<string>('');
+  const [isCreating, setIsCreating] = useState(false);
 
   const rangeMarks = [
     { value: 5, label: '5' },
@@ -231,6 +233,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
 
   const handleNext = () => {
     if (activeStep === steps.length - 1) {
+      setIsCreating(true);
       createMediaGroup(images.map(image => ({name: image.name, contentType: image.type})), authorization)
         .then(mediaGroupData => {
           console.log('Media group created:', mediaGroupData);
@@ -257,6 +260,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
               );
             })
             .then(response => {
+              setIsCreating(false);
               if (response.status === 200) {
                 console.log('Advertisement created:', response);
                 WebApp.showConfirm(t('advertisementCreated'), () => WebApp.close());
@@ -266,11 +270,13 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
               }
             })
             .catch(error => {
+              setIsCreating(false);
               console.error('Error during upload or advertisement creation:', error);
               WebApp.showAlert(t('advertisementCreationFailed'));
             });
         })
         .catch(error => {
+          setIsCreating(false);
           console.error('Error creating media group:', error);
           WebApp.showAlert(t('advertisementCreationFailed'));
         });
@@ -542,9 +548,10 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
             <StyledSpacer />
             <StyledButton 
               onClick={handleNext}
-              disabled={isNextDisabled}
+              disabled={isNextDisabled || isCreating}
+              startIcon={isCreating ? <CircularProgress size={20} color="inherit" /> : null}
             >
-              {activeStep === steps.length - 1 ? t('finish') : t('next')}
+              {isCreating ? t('creating') : activeStep === steps.length - 1 ? t('finish') : t('next')}
             </StyledButton>
           </StyledFlexRow>
         </StyledContainer>
