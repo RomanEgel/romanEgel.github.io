@@ -109,6 +109,7 @@ export const translations = {
     advertisementDetails: 'Advertisement Details',
     confirmDeleteAdvertisement: 'Are you sure you want to delete this advertisement?',
     primary: 'Primary',
+    dragToReorder: 'Drag to reorder',
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -218,6 +219,7 @@ export const translations = {
     advertisementDetails: 'Детали объявления',
     confirmDeleteAdvertisement: 'Вы уверены, что хотите удалить это объявление?',
     primary: 'Основное',
+    dragToReorder: 'Перетащите, чтобы изменить порядок',
   },
 } as const;
 

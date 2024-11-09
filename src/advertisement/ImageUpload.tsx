@@ -3,6 +3,7 @@ import { styled } from '@mui/material/styles';
 import { Typography, IconButton } from '@mui/material';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import DeleteIcon from '@mui/icons-material/Delete';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { createTranslationFunction } from '../utils';
 import WebApp from '@twa-dev/sdk';
 
@@ -100,7 +101,24 @@ const StyledBadge = styled('div')({
   padding: '2px 8px',
   borderRadius: '4px',
   fontSize: '12px',
-  zIndex: 1,
+  zIndex: 2,
+});
+
+const StyledDragHandle = styled(IconButton)({
+  position: 'absolute',
+  top: '4px',
+  left: '4px',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  color: 'white',
+  padding: '4px',
+  zIndex: 2,
+  '&:hover': {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  minWidth: '24px',
+  minHeight: '24px',
+  width: '24px',
+  height: '24px',
 });
 
 interface ImageUploadProps {
@@ -207,13 +225,21 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ images, onChange, maxImages, 
           return (
             <StyledImageContainer 
               key={`${index}-${image.name}`}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
+              draggable="false"
               onDragOver={(e) => handleDragOver(e, index)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, index)}
-              className={index === 0 ? 'primary' : ''}
             >
+              {index !== 0 && (
+                <StyledDragHandle
+                  size="small"
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, index)}
+                  aria-label={t('dragToReorder')}
+                >
+                  <DragIndicatorIcon fontSize="small" />
+                </StyledDragHandle>
+              )}
               {index === 0 && (
                 <StyledBadge>{t('primary')}</StyledBadge>
               )}
