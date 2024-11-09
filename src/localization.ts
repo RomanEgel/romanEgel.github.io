@@ -110,6 +110,7 @@ export const translations = {
     confirmDeleteAdvertisement: 'Are you sure you want to delete this advertisement?',
     primary: 'Primary',
     dragToReorder: 'Drag to reorder',
+    sponsored: "Sponsored",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -220,6 +221,7 @@ export const translations = {
     confirmDeleteAdvertisement: 'Вы уверены, что хотите удалить это объявление?',
     primary: 'Основное',
     dragToReorder: 'Перетащите, чтобы изменить порядок',
+    sponsored: "Реклама",
   },
 } as const;
 

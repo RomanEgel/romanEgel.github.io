@@ -263,3 +263,32 @@ export const deleteAdvertisement = async (adId: string, authorization: string) =
     throw new Error('Failed to delete advertisement');
   }
 };
+
+export const findAdvertisementForCommunity = async (authorization: string, communityId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/advertisements/_find-for-community`, {
+      headers: {
+        Authorization: `tma ${authorization}`,
+        'X-Community-Id': communityId
+      }
+    });
+    
+    if (!response.ok) {
+      // If response is not ok, return null advertisement
+      return { advertisement: null };
+    }
+    
+    const data = await response.json();
+    
+    // If no advertisement in response, return null
+    if (!data || !data['advertisement']) {
+      return { advertisement: null };
+    }
+
+    return {advertisement: data['advertisement']};
+  } catch (error) {
+    console.error('Error fetching advertisement:', error);
+    // In case of error, return null advertisement
+    return { advertisement: null };
+  }
+};

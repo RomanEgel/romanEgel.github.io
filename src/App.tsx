@@ -1,13 +1,13 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, ChevronLeft, ChevronRight, Bell } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile } from './apiService'
+import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile, findAdvertisementForCommunity } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
 import StorageManager from './StorageManager';
 import CardDetailView from './CardDetailView';
 import { formatDate, formatPrice, createTranslationFunction } from './utils';
-import { LocalsCommunity, LocalsUser, LocalsItem, LocalsService, LocalsEvent, LocalsNews, ListItem } from './types';
+import { LocalsCommunity, LocalsUser, LocalsItem, LocalsService, LocalsEvent, LocalsNews, ListItem, Advertisement } from './types';
 
 
 type TabType = 'events' | 'items' | 'services' | 'news'
@@ -21,6 +21,7 @@ interface AppProps {
 
 const ImageCarousel = ({ images }: { images: string[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const goToNext = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -39,28 +40,32 @@ const ImageCarousel = ({ images }: { images: string[] }) => {
   }
 
   return (
-    <div className="w-24 h-24 flex-shrink-0 relative app-image-container">
+    <div 
+      className="w-24 h-24 flex-shrink-0 relative app-image-container"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <img 
         src={images[currentIndex]} 
         alt="Item" 
         className="absolute inset-0 w-full h-full object-cover object-center"
         style={{ objectPosition: '50% 50%' }}
       />
-      {images.length > 1 && (
+      {images.length > 1 && isHovered && (
         <>
           <button 
             onClick={goToPrevious}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-r"
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-r transition-opacity duration-200"
           >
             <ChevronLeft className="h-4 w-4 text-white" />
           </button>
           <button 
             onClick={goToNext}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-l"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black/30 p-0.5 rounded-l transition-opacity duration-200"
           >
             <ChevronRight className="h-4 w-4 text-white" />
           </button>
-          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
+          <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1 transition-opacity duration-200">
             {images.map((_, index) => (
               <div 
                 key={index}
@@ -129,23 +134,37 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
   // Add this new state
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
+  // Add this new state
+  const [advertisement, setAdvertisement] = useState<Advertisement | null>(null);
+
   // Modify the fetchData function
   const fetchData = async () => {
     setIsLoading(true)
     try {
-      const [itemsResponse, servicesResponse, eventsResponse, newsResponse] = await Promise.all([
+      const [itemsResponse, servicesResponse, eventsResponse, newsResponse, adResponse] = await Promise.all([
         fetchItems(authorization, community.id),
         fetchServices(authorization, community.id),
         fetchEvents(authorization, community.id),
-        fetchNews(authorization, community.id)
+        fetchNews(authorization, community.id),
+        findAdvertisementForCommunity(authorization, community.id)
       ]);
 
       setItems(itemsResponse['items']);
       setServices(servicesResponse['services']);
       setEvents(eventsResponse['events']);
       setNews(newsResponse['news']);
+      
+      // Only set advertisement if it exists in the response
+      if (adResponse && adResponse['advertisement']) {
+        console.log('Setting advertisement:', adResponse['advertisement']);
+        setAdvertisement(adResponse['advertisement']);
+      } else {
+        setAdvertisement(null);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Ensure advertisement is cleared in case of error
+      setAdvertisement(null);
     } finally {
       setIsLoading(false)
     }
@@ -327,107 +346,123 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
       );
     }
 
-    if (filteredItems.length === 0) {
-      const entitySettings = community.entitySettings;
-      let hashtag: string;
-      let localizedEntityType: string;
-      let noRecordsFoundLocalized: string;
-      switch (activeTab) {
-        case 'events':
-          hashtag = entitySettings.eventHashtag;
-          localizedEntityType = t('event');
-          noRecordsFoundLocalized = t('noEventsFound');
-          break;
-        case 'items':
-          hashtag = entitySettings.itemHashtag;
-          localizedEntityType = t('item');
-          noRecordsFoundLocalized = t('noItemsFound');
-          break;
-        case 'services':
-          hashtag = entitySettings.serviceHashtag;
-          localizedEntityType = t('service');
-          noRecordsFoundLocalized = t('noServicesFound');
-          break;
-        case 'news':
-          hashtag = entitySettings.newsHashtag;
-          localizedEntityType = t('news');
-          noRecordsFoundLocalized = t('noNewsFound');
-          break;
-        default:
-          throw new Error('Invalid tab');
-      }
-
-      return (
-        <div className="flex flex-col items-center justify-center h-full p-4">
-          <p className="text-center app-hint mb-4">{noRecordsFoundLocalized}</p>
-          <div className="app-card rounded-lg p-4 max-w-sm">
-            <p className="text-center app-hint text-sm mb-2">
-              {t('createNewEntityInstructionPart1').replace('{{entityType}}', localizedEntityType)}
-            </p>
-            <div className="rounded border p-2 text-center">
-              <span className="font-mono app-accent font-semibold">{hashtag}</span>
-            </div>
-            <p className="text-center app-hint text-sm mt-2">
-              {t('createNewEntityInstructionPart2')}
-            </p>
-          </div>
-        </div>
-      );
-    }
     return (
       <div className="flex flex-col space-y-4 mb-16 w-full">
-        {filteredItems.map((item) => (
+        {advertisement && (
           <div 
-            key={item.id}
-            data-entity-id={item.id}
-            onClick={() => handleItemClick(item)}
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
           >
-            <ImageCarousel images={item.images || []} />
-            {item.userId === user.id && (
-              <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
-                <UserCircle2 className="h-4 w-4" />
-              </div>
-            )}
+            <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-md z-10">
+              {t('sponsored')}
+            </div>
+            <ImageCarousel images={advertisement.images || []} />
             <div className="p-4 flex-grow min-w-0">
-              <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
-              {'price' in item && 'currency' in item && (
-                <p className="font-bold app-price text-sm">
-                  {formatPrice(item.price, item.currency, community.language)}
-                </p>
-              )}
-              {'date' in item && (
-                <p className="font-bold app-event-date text-sm">
-                  {formatDate(item.date, true, community.language)}
-                </p>
-              )}
-              <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
-              <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-subtitle">
-                <p className="truncate mr-2 app-author-text">
-                  {t('postedBy')} <span 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      getLinkToUserProfile(item.userId, authorization, community.id).then(link => {
-                        openTelegramLink(link);
-                      }).catch(error => {
-                        console.error('Error getting user profile link:', error);
-                      });
-                    }}
-                    className="app-author hover:underline cursor-pointer"
-                  >
-                    {item.author}
-                  </span>
-                </p>
-                <p className="whitespace-nowrap app-publication-date">
-                  {formatDate(item.publishedAt, false, community.language)}
-                </p>
-              </div>
+              <h3 className="font-semibold truncate text-base mb-1 app-text">{advertisement.title}</h3>
+              <p className="font-bold app-price text-sm">
+                {formatPrice(advertisement.price, advertisement.currency, community.language)}
+              </p>
+              <p className="text-sm mt-1 line-clamp-2 app-subtitle">{advertisement.description}</p>
             </div>
           </div>
-        ))}
+        )}
+
+        {filteredItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-4">
+            <p className="text-center app-hint mb-4">{(() => {
+              const entitySettings = community.entitySettings;
+              switch (activeTab) {
+                case 'events': return t('noEventsFound');
+                case 'items': return t('noItemsFound');
+                case 'services': return t('noServicesFound');
+                case 'news': return t('noNewsFound');
+                default: throw new Error('Invalid tab');
+              }
+            })()}</p>
+            <div className="app-card rounded-lg p-4 max-w-sm">
+              <p className="text-center app-hint text-sm mb-2">
+                {t('createNewEntityInstructionPart1').replace('{{entityType}}', (() => {
+                  switch (activeTab) {
+                    case 'events': return t('event');
+                    case 'items': return t('item');
+                    case 'services': return t('service');
+                    case 'news': return t('news');
+                    default: throw new Error('Invalid tab');
+                  }
+                })())}
+              </p>
+              <div className="rounded border p-2 text-center">
+                <span className="font-mono app-accent font-semibold">
+                  {(() => {
+                    const entitySettings = community.entitySettings;
+                    switch (activeTab) {
+                      case 'events': return entitySettings.eventHashtag;
+                      case 'items': return entitySettings.itemHashtag;
+                      case 'services': return entitySettings.serviceHashtag;
+                      case 'news': return entitySettings.newsHashtag;
+                      default: throw new Error('Invalid tab');
+                    }
+                  })()}
+                </span>
+              </div>
+              <p className="text-center app-hint text-sm mt-2">
+                {t('createNewEntityInstructionPart2')}
+              </p>
+            </div>
+          </div>
+        ) : (
+          filteredItems.map((item) => (
+            <div 
+              key={item.id}
+              data-entity-id={item.id}
+              onClick={() => handleItemClick(item)}
+              className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
+            >
+              <ImageCarousel images={item.images || []} />
+              {item.userId === user.id && (
+                <div className="absolute top-1 left-1 bg-blue-500 text-white p-1 rounded-full">
+                  <UserCircle2 className="h-4 w-4" />
+                </div>
+              )}
+              <div className="p-4 flex-grow min-w-0">
+                <h3 className="font-semibold truncate text-base mb-1 app-text">{item.title}</h3>
+                {'price' in item && 'currency' in item && (
+                  <p className="font-bold app-price text-sm">
+                    {formatPrice(item.price, item.currency, community.language)}
+                  </p>
+                )}
+                {'date' in item && (
+                  <p className="font-bold app-event-date text-sm">
+                    {formatDate(item.date, true, community.language)}
+                  </p>
+                )}
+                <p className="text-sm mt-1 line-clamp-2 app-subtitle">{item.description}</p>
+                <div className="text-xs mt-2 flex flex-wrap justify-between items-center app-subtitle">
+                  <p className="truncate mr-2 app-author-text">
+                    {t('postedBy')} <span 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        getLinkToUserProfile(item.userId, authorization, community.id).then(link => {
+                          openTelegramLink(link);
+                        }).catch(error => {
+                          console.error('Error getting user profile link:', error);
+                        });
+                      }}
+                      className="app-author hover:underline cursor-pointer"
+                    >
+                      {item.author}
+                    </span>
+                  </p>
+                  <p className="whitespace-nowrap app-publication-date">
+                    {formatDate(item.publishedAt, false, community.language)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
-    )
-  }
+    );
+  };
 
   const [showNav, setShowNav] = useState(true);
   const [isInputFocused, setIsInputFocused] = useState(false);
