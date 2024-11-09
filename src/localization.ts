@@ -214,6 +214,7 @@ export const translations = {
     creating: 'Создание...',
     yourAdvertisements: 'Ваши объявления',
     noAdvertisementsYet: 'У Вас пока нет объявлений',
+    advertisementDetails: 'Детали объявления',
     confirmDeleteAdvertisement: 'Вы уверены, что хотите удалить это объявление?',
   },
 } as const;
