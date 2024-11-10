@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   styled,
   Button,
-  List,
   Typography,
   CircularProgress,
-  Card,
   IconButton,
   MobileStepper,
 } from '@mui/material';
