@@ -44,11 +44,6 @@ const StyledButton = styled(Button)({
   }
 });
 
-const HeaderTypography = styled(Typography)({
-  marginBottom: '10px',
-  color: 'var(--text-color)',
-});
-
 const CreateButtonContainer = styled('div')({
   marginBottom: '10px',
 });
@@ -106,6 +101,8 @@ const ListContainer = styled('div')({
   flexDirection: 'column',
   flexGrow: 1,
   overflow: 'hidden',
+  paddingTop: '48px',
+  backgroundColor: 'var(--bg-color)',
 });
 
 const ViewsContainer = styled('div')({
@@ -244,9 +241,11 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
       default:
         return (
           <>
-            <HeaderTypography variant="h5">
-              {t('yourAdvertisements')}
-            </HeaderTypography>
+            <div className="app-header flex items-center">
+              <Typography variant="h5">
+                {t('yourAdvertisements')}
+              </Typography>
+            </div>
             
             {isLoading ? (
               <div className="flex-grow flex items-center justify-center">

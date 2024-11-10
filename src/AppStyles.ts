@@ -111,6 +111,7 @@ const layoutStyles = css`
     padding-top: 10px;
     background-color: var(--section-bg-color);
     padding-bottom: 60px;
+    border: 0.5px solid var(--section-separator-color);
   }
 `
 
