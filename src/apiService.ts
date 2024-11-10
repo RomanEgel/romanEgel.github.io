@@ -168,6 +168,21 @@ export async function getLinkToUserProfile(userId: string, authorization: string
   return (await response.json())['link'];
 }
 
+export async function getLinkToUserProfileForAdvertisement(advertisementId: string, authorization: string, communityId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/advertisements/${advertisementId}/_resolve-user-link`, {
+    headers: {
+      Authorization: `tma ${authorization}`,
+      'X-Community-Id': communityId
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to get user profile link for advertisement');
+  }
+
+  return (await response.json())['link'];
+}
+
 interface SetupData {
   language: string;
   location: {lat: number, lng: number};

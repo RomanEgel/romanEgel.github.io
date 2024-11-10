@@ -1,7 +1,7 @@
 import WebApp from '@twa-dev/sdk';
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react'
 import { Store, HeartHandshake, Calendar, MapPin, Filter, Search, Newspaper, UserCircle2, Loader2, ChevronLeft, ChevronRight, Bell } from 'lucide-react'
-import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile, findAdvertisementForCommunity } from './apiService'
+import { fetchItems, fetchServices, fetchEvents, fetchNews, deleteItem, deleteService, deleteEvent, deleteNews, updateItem, updateService, updateEvent, updateNews, getLinkToUserProfile, findAdvertisementForCommunity, getLinkToUserProfileForAdvertisement } from './apiService'
 import { useAuth } from './AuthContext'
 import { translations } from './localization';
 import StorageManager from './StorageManager';
@@ -336,6 +336,18 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
     });
   };
 
+  // Add this method before the renderTabContent function
+  const handleAdvertisementClick = (advertisement: Advertisement) => {
+    getLinkToUserProfileForAdvertisement(advertisement.id, authorization, community.id)
+      .then(link => {
+        const message = t('interestedInAd').replace('{{title}}', advertisement.title);
+        openTelegramLink(`${link}?text=${encodeURIComponent(message)}`);
+      })
+      .catch(error => {
+        console.error('Error getting user profile link for advertisement:', error);
+      });
+  };
+
   const renderTabContent = () => {
     if (isLoading) {
       return (
@@ -351,6 +363,7 @@ function App({ community, user, focusEntityType, focusEntityId }: AppProps) {
         {advertisement && (
           <div 
             className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
+            onClick={() => advertisement && handleAdvertisementClick(advertisement)}
           >
             <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-500 text-white text-xs rounded-md z-10">
               {t('sponsored')}

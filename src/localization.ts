@@ -111,6 +111,7 @@ export const translations = {
     primary: 'Primary',
     dragToReorder: 'Drag to reorder',
     sponsored: "Sponsored",
+    interestedInAd: "Hello! I'm interested in your advertisement: {{title}}",
   },
   ru: {
     noRecordsFound: "Записей не найдено.",
@@ -222,6 +223,7 @@ export const translations = {
     primary: 'Основное',
     dragToReorder: 'Перетащите, чтобы изменить порядок',
     sponsored: "Реклама",
+    interestedInAd: "Здравствуйте! Меня заинтересовало ваше объявление: {{title}}",
   },
 } as const;
 
