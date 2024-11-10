@@ -136,9 +136,15 @@ const StyledStepper = styled(Stepper)(() => ({
   },
   '& .MuiStepIcon-root': {
     color: 'var(--hint-color)',
+    '& text': {
+      fill: 'var(--text-color)',
+    }
   },
   '& .MuiStepIcon-root.Mui-active, & .MuiStepIcon-root.Mui-completed': {
     color: 'var(--button-color)',
+    '& text': {
+      fill: 'var(--button-text-color)',
+    }
   },
 }));
 

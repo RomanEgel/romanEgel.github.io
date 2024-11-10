@@ -67,8 +67,8 @@ const DetailImageCarousel = ({ images }: { images: string[] }) => {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-64 md:h-80 lg:h-96 bg-gray-200 app-image-container flex items-center justify-center">
-        <div className="text-gray-400">No image available</div>
+      <div className="w-full h-64 md:h-80 lg:h-96 app-image-container flex items-center justify-center">
+        <div className="app-hint">No image available</div>
       </div>
     );
   }
@@ -88,10 +88,10 @@ const DetailImageCarousel = ({ images }: { images: string[] }) => {
   };
 
   return (
-    <div className="w-full h-64 md:h-80 lg:h-96 relative app-image-container bg-black/5">
+    <div className="w-full h-64 md:h-80 lg:h-96 relative app-image-container/5">
       {!imageLoaded && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-pulse bg-gray-200 w-full h-full" />
+          <div className="animate-pulse app-section-bg-color w-full h-full" />
         </div>
       )}
       <div className="absolute inset-0 flex items-center justify-center">
@@ -112,20 +112,20 @@ const DetailImageCarousel = ({ images }: { images: string[] }) => {
             onClick={goToPrevious}
             className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors"
           >
-            <ChevronLeft className="h-6 w-6 text-white" />
+            <ChevronLeft className="h-6 w-6 app-button-text" />
           </button>
           <button 
             onClick={goToNext}
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 p-2 rounded-full hover:bg-black/50 transition-colors"
           >
-            <ChevronRight className="h-6 w-6 text-white" />
+            <ChevronRight className="h-6 w-6 app-button-text" />
           </button>
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
             {images.map((_, index) => (
               <div 
                 key={index}
                 className={`h-2 w-2 rounded-full transition-colors ${
-                  index === currentIndex ? 'bg-white' : 'bg-white/50'
+                  index === currentIndex ? 'app-button-text' : 'app-hint'
                 }`}
               />
             ))}
@@ -241,10 +241,10 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
         <div className="app-header flex justify-end items-center p-2">
           {isCurrentUserAuthor && !isEditing && (
             <div>
-              <button onClick={handleEdit} className="p-2 bg-white bg-opacity-70 rounded-full app-button-edit mr-2">
+              <button onClick={handleEdit} className="p-2 app-button-edit rounded-full mr-2">
                 <Pencil className="h-5 w-5" />
               </button>
-              <button onClick={handleDelete} className="p-2 bg-white bg-opacity-70 rounded-full app-button-delete">
+              <button onClick={handleDelete} className="p-2 app-button-delete rounded-full">
                 <Trash2 className="h-5 w-5" />
               </button>
             </div>
@@ -254,7 +254,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
         <div className="flex-grow overflow-y-auto app-card-detail-content">
           <DetailImageCarousel images={item.images || []} />
           
-          <div className="p-4" style={{ color: theme.palette.text.primary }}>
+          <div className="p-4">
             {!isEditing && (
               <>
                 <h2 className="text-lg font-semibold mb-4 app-text">{item.title}</h2>
@@ -265,7 +265,7 @@ const CardDetailView: React.FC<CardDetailViewProps> = ({
                 )}
                 {'date' in item && (
                   <p className="font-bold app-event-date text-lg mb-2">
-                    {formatDate(item.date, true, communityLanguage)} {/* Add a parameter to include time */}
+                    {formatDate(item.date, true, communityLanguage)}
                   </p>
                 )}
                 <div className="flex justify-between items-center mb-4 text-sm">

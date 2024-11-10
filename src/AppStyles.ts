@@ -42,12 +42,12 @@ const createCSSVariables = (theme_params: ThemeParams) => `
 
 const baseStyles = css`
   .app-body {
-    background-color: var(--secondary-bg-color);
+    background-color: var(--bg-color);
     color: var(--text-color);
     padding-bottom: env(safe-area-inset-bottom);
   }
   .app-container {
-    background-color: var(--secondary-bg-color);
+    background-color: var(--bg-color);
     max-width: 100%;
     height: 100%;
     display: flex;
@@ -83,7 +83,7 @@ const layoutStyles = css`
     left: env(safe-area-inset-left);
     right: env(safe-area-inset-right);
     z-index: 10;
-    background-color: var(--header-bg-color);
+    background-color: var(--secondary-bg-color);
     padding: 0.5rem 1rem;
     height: 60px;
   }
@@ -109,7 +109,7 @@ const layoutStyles = css`
     flex-grow: 1;
     overflow-y: auto;
     padding-top: 10px;
-    background-color: var(--bg-color);
+    background-color: var(--section-bg-color);
     padding-bottom: 60px;
   }
 `
@@ -154,9 +154,10 @@ const componentStyles = css`
   }
   .app-card {
     background-color: var(--section-bg-color);
+    box-shadow: 0 1px 3px var(--section-separator-color);
   }
   .app-dropdown {
-    background-color: var(--secondary-bg-color);
+    background-color: var(--bg-color);
     border: 1px solid var(--hint-color)33;
   }
   .app-dropdown-item {
@@ -174,13 +175,13 @@ const componentStyles = css`
     &.active {
       color: var(--link-color);
     }
-    border: 1px solid var(--secondary-bg-color);
+    border: 1px solid var(--bg-color);
   }
   .app-search-icon {
     color: var(--hint-color);
   }
   .app-image-container {
-    background-color: var(--secondary-bg-color);
+    background-color: var(--bg-color);
   }
 
   .app-button-save {
