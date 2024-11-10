@@ -21,20 +21,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 
-const StyledContainer = styled('div')({
-  padding: '0 16px',
-  width: '100%',
-  margin: '0 auto',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-});
-
-const StyledTypography = styled(Typography)({
-  color: 'var(--text-color)',
-  marginBottom: '10px',
-});
-
 const StyledButton = styled(Button)({
   backgroundColor: 'var(--button-color)',
   color: 'var(--button-text-color)',
@@ -48,85 +34,25 @@ const CreateButtonContainer = styled('div')({
   marginBottom: '10px',
 });
 
-const ListItemContainer = styled('div')({
-  marginBottom: '8px',
-  '& .app-card-detail-content': {
-    padding: '12px',
-    backgroundColor: 'var(--section-bg-color)',
-    borderRadius: '8px',
-    height: 'auto',
-    display: 'flex',
-    flexDirection: 'row',
-    gap: '16px',
-  }
-});
-
 const AdImageContainer = styled('div')({
-  width: '140px',
+  width: '96px',
+  height: '96px',
   flexShrink: 0,
 });
 
 const AdImage = styled('img')({
-  width: '140px',
-  height: '140px',
+  width: '96px',
+  height: '96px',
   objectFit: 'cover',
-  borderRadius: '4px',
+  borderRadius: '8px',
 });
 
-const AdContent = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  flexGrow: 1,
-  height: '140px',
-});
-
-const ScrollableList = styled(List)({
-  padding: 0,
-  flexGrow: 1,
-  overflow: 'auto',
-  '&::-webkit-scrollbar': {
-    width: '4px',
-  },
-  '&::-webkit-scrollbar-track': {
-    background: 'transparent',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    background: 'var(--secondary-bg-color)',
-    borderRadius: '4px',
-  },
-});
-
-const ListContainer = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-  flexGrow: 1,
-  overflow: 'hidden',
-  paddingTop: '48px',
-  backgroundColor: 'var(--bg-color)',
-});
 
 const ViewsContainer = styled('div')({
   display: 'flex',
   alignItems: 'center',
   gap: '4px',
-  marginLeft: 'auto',
-});
-
-const StyledCard = styled(Card)({
-  backgroundColor: 'var(--section-bg-color)',
-  borderRadius: '8px',
-  cursor: 'default',
-  '&:hover': {
-    opacity: 1,
-  }
-});
-
-const CardContent = styled('div')({
-  padding: '12px',
-  display: 'flex',
-  flexDirection: 'row',
-  gap: '16px',
-  position: 'relative', // For positioning delete button
+  marginTop: '8px',
 });
 
 const DeleteButton = styled(IconButton)({
@@ -173,6 +99,13 @@ const CarouselButton = styled(IconButton)({
   '&.Mui-disabled': {
     color: 'rgba(255, 255, 255, 0.3)',
   },
+});
+
+// Add new styled component for main content
+const AdMainContent = styled('main')({
+  flexGrow: 1,
+  overflowY: 'auto',
+  paddingTop: '50px', // Just enough space for the header
 });
 
 interface AdvertiseAppProps {
@@ -242,7 +175,7 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
         return (
           <>
             <div className="app-header flex items-center">
-              <Typography variant="h5">
+              <Typography variant="h5" sx={{ margin: 0 }}>
                 {t('yourAdvertisements')}
               </Typography>
             </div>
@@ -253,96 +186,91 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
               </div>
             ) : advertisements.length === 0 ? (
               <div className="flex-grow flex flex-col items-center justify-center">
-                <StyledTypography variant="body1" className="mb-4">
+                <Typography variant="body1" className="mb-4">
                   {t('noAdvertisementsYet')}
-                </StyledTypography>
+                </Typography>
                 <StyledButton
                   variant="contained"
                   startIcon={<AddIcon />}
                   onClick={handleCreateClick}
-                  
                 >
                   {t('createAdvertisement')}
                 </StyledButton>
               </div>
             ) : (
-              <ListContainer>
-                <CreateButtonContainer>
-                  <StyledButton
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleCreateClick}
-                    fullWidth
-                  >
-                    {t('createAdvertisement')}
-                  </StyledButton>
-                </CreateButtonContainer>
-                <ScrollableList>
-                  {advertisements.map((ad) => (
-                    <ListItemContainer key={ad.id}>
-                      <StyledCard>
-                        <CardContent className="app-card-detail-content">
-                          <DeleteButton
-                            onClick={() => handleDeleteAd(ad.id)}
-                            size="small"
+              <AdMainContent>
+                <div className="px-4">
+                  <CreateButtonContainer>
+                    <StyledButton
+                      variant="contained"
+                      startIcon={<AddIcon />}
+                      onClick={handleCreateClick}
+                      fullWidth
+                    >
+                      {t('createAdvertisement')}
+                    </StyledButton>
+                  </CreateButtonContainer>
+                  <div className="flex flex-col space-y-4 mb-16 w-full">
+                    {advertisements.map((ad) => (
+                      <div 
+                        key={ad.id} 
+                        className="rounded-lg shadow overflow-hidden flex items-center cursor-pointer app-card relative"
+                      >
+                        <DeleteButton
+                          onClick={() => handleDeleteAd(ad.id)}
+                          size="small"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </DeleteButton>
+
+                        {ad.images && ad.images.length > 0 && (
+                          <AdImageContainer>
+                            <ImageCarouselComponent images={ad.images} />
+                          </AdImageContainer>
+                        )}
+
+                        <div className="p-4 flex-grow min-w-0">
+                          <Typography 
+                            variant="subtitle1" 
+                            className="font-semibold truncate text-base mb-1 app-text"
                           >
-                            <DeleteIcon fontSize="small" />
-                          </DeleteButton>
-                          
-                          {ad.images && ad.images.length > 0 && (
-                            <AdImageContainer>
-                              <ImageCarouselComponent images={ad.images} />
-                            </AdImageContainer>
-                          )}
-                          <AdContent>
-                            <Typography 
-                              variant="subtitle1" 
-                              style={{ 
-                                fontWeight: 'bold', 
-                                color: 'var(--text-color)',
-                                lineHeight: 1.2,
-                              }}
-                            >
-                              {ad.title}
-                            </Typography>
-                            <Typography 
-                              variant="body2" 
-                              className="app-price"
-                              style={{ marginTop: '8px' }}
-                            >
-                              {ad.price} {ad.currency}
-                            </Typography>
+                            {ad.title}
+                          </Typography>
+                          <Typography 
+                            variant="body2" 
+                            className="font-bold app-price text-sm"
+                          >
+                            {ad.price} {ad.currency}
+                          </Typography>
+                          <Typography 
+                            variant="body2" 
+                            className="text-sm mt-1 line-clamp-2 app-subtitle"
+                            sx={{ 
+                              color: 'var(--subtitle-text-color)',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {ad.description}
+                          </Typography>
+                          <ViewsContainer>
+                            <VisibilityIcon sx={{ fontSize: 16, color: 'var(--subtitle-text-color)' }} />
                             <Typography 
                               variant="body2" 
-                              sx={{ 
-                                color: 'var(--subtitle-text-color)',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                marginTop: '8px',
-                                flex: 1,
-                              }}
+                              sx={{ color: 'var(--subtitle-text-color)' }}
                             >
-                              {ad.description}
+                              {ad.views || 0}
                             </Typography>
-                            <ViewsContainer>
-                              <VisibilityIcon sx={{ fontSize: 16, color: 'var(--subtitle-text-color)' }} />
-                              <Typography 
-                                variant="body2" 
-                                sx={{ color: 'var(--subtitle-text-color)' }}
-                              >
-                                {ad.views || 0}
-                              </Typography>
-                            </ViewsContainer>
-                          </AdContent>
-                        </CardContent>
-                      </StyledCard>
-                    </ListItemContainer>
-                  ))}
-                </ScrollableList>
-              </ListContainer>
+                          </ViewsContainer>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </AdMainContent>
             )}
           </>
         );
@@ -352,9 +280,9 @@ const AdvertiseApp: React.FC<AdvertiseAppProps> = ({ language }) => {
   return (
     <CustomThemeProvider>
       <div className="min-h-screen flex flex-col app-body">
-        <StyledContainer className="flex-grow flex flex-col app-container">
+        <div className="flex-grow flex flex-col app-container">
           {renderContent()}
-        </StyledContainer>
+        </div>
       </div>
     </CustomThemeProvider>
   );

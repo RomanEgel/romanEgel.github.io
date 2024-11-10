@@ -95,12 +95,6 @@ const StyledIcon = styled('img')(() => ({
   boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
 }));
 
-const StyledContainer = styled('div')({
-  padding: '0 16px',
-  width: '100%',
-  margin: '0 auto',
-});
-
 const StyledStepConnector = styled(StepConnector)(() => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 10,
@@ -404,7 +398,7 @@ const AdvertiseSetup: React.FC<AdvertiseSetupProps> = ({ language, onBack }) => 
   return (
     <CustomThemeProvider>
       <div className="min-h-screen flex flex-col app-body">
-        <StyledContainer className="flex-grow flex flex-col app-container">
+        <div className="flex-grow flex flex-col app-container">
           <StyledIcon src="/icon.png" alt="Advertise Icon" />
           <StyledTypography variant="h5" gutterBottom align="center">
             {t('createAdvertisement')}
@@ -565,7 +559,7 @@ const AdvertiseSetup: React.FC<AdvertiseSetupProps> = ({ language, onBack }) => 
               {isCreating ? t('creating') : activeStep === steps.length - 1 ? t('finish') : t('next')}
             </StyledButton>
           </StyledFlexRow>
-        </StyledContainer>
+        </div>
       </div>
     </CustomThemeProvider>
   );
