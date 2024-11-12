@@ -36,6 +36,7 @@ const AdImageContainer = styled('div')({
   width: '96px',
   height: '96px',
   flexShrink: 0,
+  position: 'relative',
 });
 
 const AdImage = styled('img')({
@@ -51,6 +52,7 @@ const ViewsContainer = styled('div')({
   alignItems: 'center',
   gap: '4px',
   marginTop: '8px',
+  justifyContent: 'flex-end',
 });
 
 const DeleteButton = styled(IconButton)({
@@ -68,9 +70,11 @@ const DeleteButton = styled(IconButton)({
 });
 
 const ImageCarousel = styled('div')({
-  position: 'relative',
-  width: '140px',
-  height: '140px',
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '96px',
+  height: '96px',
   '&:hover .carousel-stepper': {
     opacity: 1,
   },
@@ -79,12 +83,16 @@ const ImageCarousel = styled('div')({
 const CarouselStepper = styled(MobileStepper)({
   position: 'absolute',
   bottom: 0,
+  left: 0,
   width: '100%',
+  height: '32px',
+  padding: '0 4px',
   background: 'rgba(0, 0, 0, 0.3)',
   opacity: 0,
   transition: 'opacity 0.2s ease-in-out',
   '& .MuiMobileStepper-dot': {
     backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    margin: '0 2px',
   },
   '& .MuiMobileStepper-dotActive': {
     backgroundColor: 'white',
@@ -93,7 +101,12 @@ const CarouselStepper = styled(MobileStepper)({
 
 const CarouselButton = styled(IconButton)({
   color: 'white',
-  padding: '4px',
+  padding: 0,
+  width: '24px',
+  height: '24px',
+  '& .MuiSvgIcon-root': {
+    fontSize: '20px',
+  },
   '&.Mui-disabled': {
     color: 'rgba(255, 255, 255, 0.3)',
   },

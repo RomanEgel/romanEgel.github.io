@@ -111,7 +111,6 @@ const layoutStyles = css`
     padding-top: 10px;
     background-color: var(--section-bg-color);
     padding-bottom: 60px;
-    border: 0.5px solid var(--section-separator-color);
   }
 `
 
@@ -155,7 +154,8 @@ const componentStyles = css`
   }
   .app-card {
     background-color: var(--section-bg-color);
-    box-shadow: 0 1px 3px var(--section-separator-color);
+    box-shadow: 0 2px 3px var(--section-separator-color);
+    border: 0.5px solid var(--section-separator-color);
   }
   .app-dropdown {
     background-color: var(--bg-color);
